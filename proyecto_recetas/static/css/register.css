@@ -1,0 +1,742 @@
+.registro-container1 {
+  width: 100%;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+}
+ 
+.registro-thq-userrequest-elm {
+  width: 100%;
+  height: auto;
+  display: flex;
+  padding: 32px 0.00006103515625px 0 0;
+  align-items: flex-start;
+  flex-shrink: 0;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 1);
+}
+ 
+.registro-thq-container-elm10 {
+  width: 393px;
+  height: 960.9861450195312px;
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-container-elm11 {
+  top: 0px;
+  left: 0px;
+  width: 393px;
+  height: 72px;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  flex-shrink: 0;
+  justify-content: center;
+}
+ 
+.registro-thq-container-elm12 {
+  gap: 12px;
+  width: 154.22222900390625px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-container-elm13 {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  justify-content: center;
+  background-color: rgba(0, 166, 62, 1);
+}
+ 
+.registro-thq-x-elm {
+  width: 24px;
+  height: 24px;
+}
+ 
+.registro-thq-span-elm1 {
+  width: 102.22222137451172px;
+  height: 28px;
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm10 {
+  color: rgba(10, 10, 10, 1);
+  height: auto;
+  font-size: 20px;
+  font-style: Semi Bold;
+  text-align: left;
+  font-family: Inter;
+  font-weight: 700;
+  line-height: 28px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-container-elm14 {
+  top: 120px;
+  left: 0px;
+  width: 393px;
+  height: 1px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  background-color: rgba(229, 231, 235, 1);
+}
+ 
+.registro-thq-container-elm15 {
+  gap: 8.000003814697266px;
+  top: 153px;
+  left: 0px;
+  width: 393px;
+  height: 59.98611068725586px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+ 
+.registro-thq-h1-elm {
+  width: 393px;
+  height: 31.98611068725586px;
+  display: flex;
+  position: relative;
+  align-self: stretch;
+  align-items: flex-start;
+}
+ 
+.registro-thq-text-elm11 {
+  top: -2.888885498046875px;
+  left: 110.27780151367188px;
+  color: rgba(10, 10, 10, 1);
+  height: auto;
+  position: absolute;
+  font-size: 24px;
+  font-style: Bold;
+  text-align: center;
+  font-family: Inter;
+  font-weight: 700;
+  line-height: 32px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-p-elm {
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm12 {
+  color: rgba(106, 114, 130, 1);
+  height: auto;
+  flex-grow: 1;
+  font-size: 14px;
+  font-style: Regular;
+  text-align: center;
+  font-family: Inter;
+  font-weight: 400;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-form-elm {
+  top: 257px;
+  left: 22px;
+  width: 385px;
+  height: 512px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-div-elm1 {
+  gap: 8px;
+  top: 0px;
+  left: 0px;
+  width: 393px;
+  height: 76px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+ 
+.registro-thq-label-elm1 {
+  width: 393px;
+  height: 20px;
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm13 {
+  color: rgba(16, 24, 40, 1);
+  height: auto;
+  flex-grow: 1;
+  font-size: 14px;
+  font-style: Medium;
+  text-align: left;
+  font-family: Inter;
+  font-weight: 500;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-container-elm16 {
+  width: 345px;
+  height: 48px;
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-input-elm1 {
+  top: 0px;
+  left: 0px;
+  color: rgba(113, 113, 130, 1);
+  width: 345px;
+  height: 48px;
+  display: flex;
+  padding: 4px 12px 4px 40px;
+  overflow: hidden;
+  position: absolute;
+  font-size: 14px;
+  text-align: left;
+  align-items: center;
+  flex-shrink: 0;
+  font-family: Inter;
+  font-weight: 400;
+  border-radius: 10px;
+  background-color: rgba(249, 250, 251, 1);
+}
+ 
+.registro-thq-user-elm {
+  top: 14px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+}
+ 
+.registro-thq-div-elm2 {
+  gap: 8px;
+  top: 96px;
+  left: 0px;
+  width: 345px;
+  height: 83px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+ 
+.registro-thq-label-elm2 {
+  width: 393px;
+  height: 20px;
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm14 {
+  color: rgba(16, 24, 40, 1);
+  height: auto;
+  flex-grow: 1;
+  font-size: 14px;
+  font-style: Medium;
+  text-align: left;
+  font-family: Inter;
+  font-weight: 500;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-container-elm17 {
+  width: 345px;
+  height: 48px;
+  display: flex;
+  position: relative;
+  align-self: stretch;
+  align-items: flex-start;
+}
+ 
+.registro-thq-input-elm2 {
+  top: 0px;
+  left: 0px;
+  color: rgba(113, 113, 130, 1);
+  width: 345px;
+  height: 48px;
+  display: flex;
+  padding: 4px 12px 4px 40px;
+  overflow: hidden;
+  position: absolute;
+  font-size: 14px;
+  text-align: left;
+  align-items: center;
+  flex-shrink: 0;
+  font-family: Inter;
+  font-weight: 400;
+  border-radius: 10px;
+  background-color: rgba(249, 250, 251, 1);
+}
+ 
+.registro-thq-mail-elm {
+  top: 14px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+}
+ 
+.registro-thq-div-elm3 {
+  gap: 8px;
+  top: 192px;
+  left: 0px;
+  width: 345px;
+  height: 81px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+ 
+.registro-thq-label-elm3 {
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm15 {
+  color: rgba(16, 24, 40, 1);
+  height: auto;
+  flex-grow: 1;
+  font-size: 14px;
+  font-style: Medium;
+  text-align: left;
+  font-family: Inter;
+  font-weight: 500;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-container-elm18 {
+  width: 345px;
+  height: 48px;
+  display: flex;
+  position: relative;
+  align-self: stretch;
+  align-items: flex-start;
+}
+ 
+.registro-thq-input-elm3 {
+  top: 0px;
+  left: 0px;
+  color: rgba(113, 113, 130, 1);
+  width: 345px;
+  height: 48px;
+  display: flex;
+  padding: 4px 40px;
+  overflow: hidden;
+  position: absolute;
+  font-size: 14px;
+  text-align: left;
+  align-items: center;
+  flex-shrink: 0;
+  font-family: Inter;
+  font-weight: 400;
+  border-radius: 10px;
+  background-color: rgba(249, 250, 251, 1);
+}
+ 
+.registro-thq-lock-elm1 {
+  top: 14px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+}
+ 
+.registro-thq-div-elm4 {
+  gap: 8px;
+  top: 288.0000305175781px;
+  left: 0px;
+  width: 345px;
+  height: 76px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+ 
+.registro-thq-label-elm4 {
+  display: flex;
+  align-self: stretch;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm16 {
+  color: rgba(16, 24, 40, 1);
+  height: auto;
+  flex-grow: 1;
+  font-size: 14px;
+  font-style: Medium;
+  text-align: left;
+  font-family: Inter;
+  font-weight: 500;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-container-elm19 {
+  width: 345px;
+  height: 48px;
+  display: flex;
+  position: relative;
+  align-self: stretch;
+  align-items: flex-start;
+}
+ 
+.registro-thq-input-elm4 {
+  top: 0px;
+  left: 0px;
+  color: rgba(113, 113, 130, 1);
+  width: 345px;
+  height: 48px;
+  display: flex;
+  padding: 4px 40px;
+  overflow: hidden;
+  position: absolute;
+  font-size: 14px;
+  text-align: left;
+  align-items: center;
+  flex-shrink: 0;
+  font-family: Inter;
+  font-weight: 400;
+  border-radius: 10px;
+  background-color: rgba(249, 250, 251, 1);
+}
+ 
+.registro-thq-lock-elm2 {
+  top: 14px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+}
+ 
+.registro-thq-div-elm5 {
+  top: 384.0000305175781px;
+  left: 0px;
+  width: 393px;
+  height: 44px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-checkbox-elm {
+  top: 8px;
+  left: 0px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  padding: 0.8888890147209167px;
+  position: absolute;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05000000074505806) ;
+  align-items: flex-start;
+  flex-shrink: 0;
+  border-color: rgba(0, 0, 0, 0.10000000149011612);
+  border-style: solid;
+  border-width: 0.8888890147209167px;
+  border-radius: 4px;
+  background-color: rgba(243, 243, 245, 1);
+}
+ 
+.registro-thq-label-elm5 {
+  top: 4px;
+  left: 24px;
+  width: 369px;
+  height: 40px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm17 {
+  top: -1px;
+  color: rgba(54, 65, 83, 1);
+  width: 321px;
+  height: auto;
+  position: absolute;
+  font-size: 14px;
+  font-style: Medium;
+  text-align: left;
+  font-family: Inter;
+  font-weight: 500;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-text-elm18 {
+  color: rgba(54, 65, 83, 1);
+}
+ 
+.registro-thq-text-elm19 {
+  color: rgba(34, 197, 94, 1);
+}
+ 
+.registro-thq-text-elm20 {
+  color: rgba(54, 65, 83, 1);
+}
+ 
+.registro-thq-button-elm1 {
+  top: 741px;
+  left: 71px;
+  width: 268px;
+  height: 48px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  border-radius: 29826200px;
+  background-color: rgba(0, 166, 62, 1);
+}
+ 
+.registro-thq-text-elm22 {
+  top: 9.888885498046875px;
+  left: 82.33331298828125px;
+  color: rgba(255, 255, 255, 1);
+  height: auto;
+  position: absolute;
+  font-size: 16px;
+  font-style: Bold;
+  text-align: center;
+  font-family: Inter;
+  font-weight: 700;
+  line-height: 24px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-container-elm20 {
+  gap: 15.999984741210938px;
+  top: 796.9861450195312px;
+  left: 0px;
+  width: 393px;
+  height: 20px;
+  display: flex;
+  padding: 0 -0.0000152587890625px 0 0;
+  position: absolute;
+  align-items: center;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-container-elm21 {
+  width: 131.1666717529297px;
+  height: 1px;
+  display: flex;
+  position: relative;
+  flex-grow: 1;
+  align-items: flex-start;
+  flex-shrink: 0;
+  background-color: rgba(229, 231, 235, 1);
+}
+ 
+.registro-thq-span-elm2 {
+  width: 98.66666412353516px;
+  height: 20px;
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm23 {
+  color: rgba(153, 161, 175, 1);
+  height: auto;
+  font-size: 14px;
+  font-style: Regular;
+  text-align: left;
+  font-family: Inter;
+  font-weight: 400;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-container-elm22 {
+  width: 131.1666717529297px;
+  height: 1px;
+  display: flex;
+  position: relative;
+  flex-grow: 1;
+  align-items: flex-start;
+  flex-shrink: 0;
+  background-color: rgba(229, 231, 235, 1);
+}
+ 
+.registro-thq-container-elm23 {
+  gap: 16px;
+  top: 848.9861450195312px;
+  left: 0px;
+  width: 393px;
+  height: 56px;
+  display: flex;
+  padding: 0 0 0 0.00006103515625px;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+  justify-content: center;
+}
+ 
+.registro-thq-button-elm2 {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-color: rgba(229, 231, 235, 1);
+  border-style: solid;
+  border-width: 0.8888890147209167px;
+  border-radius: 29826200px;
+  justify-content: center;
+}
+ 
+.registro-thq-svg-elm1 {
+  width: 24px;
+  height: 24px;
+}
+ 
+.registro-thq-button-elm3 {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-color: rgba(229, 231, 235, 1);
+  border-style: solid;
+  border-width: 0.8888890147209167px;
+  border-radius: 29826200px;
+  justify-content: center;
+}
+ 
+.registro-thq-svg-elm2 {
+  width: 24px;
+  height: 24px;
+}
+ 
+.registro-thq-button-elm4 {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-color: rgba(229, 231, 235, 1);
+  border-style: solid;
+  border-width: 0.8888890147209167px;
+  border-radius: 29826200px;
+  justify-content: center;
+}
+ 
+.registro-thq-svg-elm3 {
+  width: 24px;
+  height: 24px;
+}
+ 
+.registro-thq-container-elm24 {
+  top: 936.9861450195312px;
+  left: 0px;
+  width: 393px;
+  height: 24px;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+ 
+.registro-thq-text-elm24 {
+  top: 0.5555419921875px;
+  left: 76.83334350585938px;
+  color: rgba(74, 85, 101, 1);
+  height: auto;
+  position: absolute;
+  font-size: 14px;
+  font-style: Regular;
+  text-align: center;
+  font-family: Inter;
+  font-weight: 400;
+  line-height: 20px;
+  font-stretch: normal;
+  text-decoration: none;
+}
+ 
+.registro-thq-text-elm25 {
+  color: rgba(74, 85, 101, 1);
+  font-weight: 400;
+}
+ 
+.registro-link {
+  display: contents;
+}
+ 
+.registro-container2 {
+  right: 50px;
+  border: 1px solid #ffffff5c;
+  bottom: 30px;
+  display: flex;
+  z-index: 22;
+  position: fixed;
+  box-shadow: 5px 5px 10px 0px rgba(31, 31, 31, 0.4);
+  min-height: auto;
+  align-items: center;
+  padding-top: 8px;
+  padding-left: 12px;
+  border-radius: 8px;
+  padding-right: 12px;
+  padding-bottom: 8px;
+  backdrop-filter: blur(6px);
+  background-color: rgba(41, 41, 41, 0.41);
+}
+ 
+.registro-icon1 {
+  width: 24px;
+  margin-right: 4px;
+}
+ 
+.registro-text {
+  color: white;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+}
