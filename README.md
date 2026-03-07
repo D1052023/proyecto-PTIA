@@ -19,17 +19,11 @@ Sistema basado en Aprendizaje Supervisado que:
 2. Detecta los ingredientes usando un modelo CNN con Transfer Learning
 3. Recomienda recetas que contengan esos ingredientes
 
+## Arquitectura
+
 Arquitectura:
 
-Frontend (HTML)
-↓
-Flask API (Python)
-↓
-Modelo CNN (MobileNetV2)
-↓
-Motor de recomendación
-
----
+Frontend (HTML) -> Flask API (Python) -> Modelo CNN (MobileNetV2) -> Motor de recomendación
 
 ## Requisitos
 
