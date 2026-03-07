@@ -1,5 +1,15 @@
 # proyecto-PTIA
 ---
+## 👥 Integrantes del Proyecto
+
+| Nombre                                     | Rol        |
+| ------------------------------------------ | ---------- |
+| 👨‍💻 **Oscar Andrés Sánchez Porras**      | Desarrollo |
+| 👨‍💻 **Diego Fernando Chavarro Castillo** | Desarrollo |
+
+---
+
+
 
 ## Descripción
 
