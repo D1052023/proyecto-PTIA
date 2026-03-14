@@ -52,7 +52,7 @@ pip install flask flask-sqlalchemy werkzeug
 ┃ ┃ ┣ 📂 public/                # Archivos públicos del sitio
 ┃ ┃ ┃ ┣ 🤖 robots.txt
 ┃ ┃ ┃ ┗ 🖼️ image.svg
-┃ ┃ ┗ 📂 templates/             # Plantillas HTML
+┃ ┣  📂 templates/             # Plantillas HTML
 ┃ ┃   ┗ 🌐 archivo.html
 ┃ ┣ 🐍 app.py                   # Aplicación principal
 ┃ ┣ 🗄️ database.db              # Base de datos SQLite
@@ -85,4 +85,5 @@ py app.py
 
 ```
 http://127.0.0.1:5000
+
 ```

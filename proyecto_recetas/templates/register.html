@@ -1,232 +1,291 @@
 <!DOCTYPE html>
 <html lang="english">
-  <head>
-    <title>registro - exported project</title>
-    <meta property="og:title" content="registro - exported project" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta charset="utf-8" />
-    <meta property="twitter:card" content="summary_large_image" />
 
-    <style data-tag="reset-style-sheet">
-      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}pre {  white-space: normal;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}html { scroll-behavior: smooth  }
-    </style>
-    <style data-tag="default-style-sheet">
-      html {
-        font-family: Inter;
-        font-size: 16px;
-      }
+<head>
+  <title>con - exported project</title>
+  <meta property="og:title" content="con - exported project" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta property="twitter:card" content="summary_large_image" />
 
-      body {
-        font-weight: 400;
-        font-style:normal;
-        text-decoration: none;
-        text-transform: none;
-        letter-spacing: normal;
-        line-height: 1.15;
-        color: var(--dl-color-theme-neutral-dark);
-        background: var(--dl-color-theme-neutral-light);
+  <style data-tag="reset-style-sheet">
+    html {
+      line-height: 1.15;
+    }
 
-        fill: var(--dl-color-theme-neutral-dark);
-      }
-    </style>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/animate.css@4.1.1/animate.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
-      data-tag="font"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
-      data-tag="font"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
-      data-tag="font"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&amp;display=swap"
-      data-tag="font"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@teleporthq/teleport-custom-scripts/dist/style.css"
-    />
-  </head>
-  <body>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <div>
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+    body {
+      margin: 0;
+    }
 
-      <div class="registro-container1">
-        <div class="registro-thq-userrequest-elm">
-          <div class="registro-thq-container-elm10">
-            <div class="registro-thq-container-elm11">
-              <div class="registro-thq-container-elm12">
-                <div class="registro-thq-container-elm13">
-                  <img
-                    src="{{ url_for('static', filename='public/x1201-04d9.svg') }}"
-                    alt="X1201"
-                    class="registro-thq-x-elm"
-                  />
-                </div>
-                <div class="registro-thq-span-elm1">
-                  <span class="registro-thq-text-elm10">RecetaFácil</span>
-                </div>
-              </div>
+    * {
+      box-sizing: border-box;
+      border-width: 0;
+      border-style: solid;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    p,
+    li,
+    ul,
+    pre,
+    div,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    figure,
+    blockquote,
+    figcaption {
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      background-color: transparent;
+    }
+
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+      font-family: inherit;
+      font-size: 100%;
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    button,
+    select {
+      text-transform: none;
+    }
+
+    button,
+    [type="button"],
+    [type="reset"],
+    [type="submit"] {
+      -webkit-appearance: button;
+      color: inherit;
+    }
+
+    button::-moz-focus-inner,
+    [type="button"]::-moz-focus-inner,
+    [type="reset"]::-moz-focus-inner,
+    [type="submit"]::-moz-focus-inner {
+      border-style: none;
+      padding: 0;
+    }
+
+    button:-moz-focus,
+    [type="button"]:-moz-focus,
+    [type="reset"]:-moz-focus,
+    [type="submit"]:-moz-focus {
+      outline: 1px dotted ButtonText;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    pre {
+      white-space: normal;
+    }
+
+    input {
+      padding: 2px 4px;
+    }
+
+    img {
+      display: block;
+    }
+
+    details {
+      display: block;
+      margin: 0;
+      padding: 0;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    [data-thq="accordion"] [data-thq="accordion-content"] {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out;
+      padding: 0;
+    }
+
+    [data-thq="accordion"] details[data-thq="accordion-trigger"][open]+[data-thq="accordion-content"] {
+      max-height: 1000vh;
+    }
+
+    details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {
+      transform: rotate(180deg);
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+  </style>
+  <style data-tag="default-style-sheet">
+    html {
+      font-family: Inter;
+      font-size: 16px;
+    }
+
+    body {
+      font-weight: 400;
+      font-style: normal;
+      text-decoration: none;
+      text-transform: none;
+      letter-spacing: normal;
+      line-height: 1.15;
+      color: var(--dl-color-theme-neutral-dark);
+      background: var(--dl-color-theme-neutral-light);
+
+      fill: var(--dl-color-theme-neutral-dark);
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@4.1.1/animate.css" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+    data-tag="font" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+    data-tag="font" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+    data-tag="font" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&amp;display=swap"
+    data-tag="font" />
+  <link rel="stylesheet" href="https://unpkg.com/@teleporthq/teleport-custom-scripts/dist/style.css" />
+</head>
+
+<body>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <div>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+
+    <div class="con-container1">
+      <div class="con-thq-holidays-planner-elm">
+        <div class="con-thq-container-elm10">
+          <img src="{{ url_for('static', filename='public/fondologin.svg') }}" alt="" />
+        </div>
+        <div class="con-thq-container-elm11"></div>
+        <div class="con-thq-signup-form-elm">
+          <div class="con-thq-container-elm12">
+            <div class="con-thq-container-elm13">
+              <img src="{{ url_for('static', filename='public/x.svg') }}" alt="Icon1478" class="con-thq-icon-elm1" />
             </div>
-            <div class="registro-thq-container-elm14"></div>
-            <div class="registro-thq-container-elm15">
-              <div class="registro-thq-h1-elm">
-                <span class="registro-thq-text-elm11">Crea tu cuenta</span>
-              </div>
-              <div class="registro-thq-p-elm">
-                <span class="registro-thq-text-elm12">
-                  Regístrate para empezar a cocinar
-                </span>
-              </div>
+            <div class="con-thq-text-elm10">
+              <span class="con-thq-text-elm11">RecetaFácil</span>
             </div>
-            <div class="registro-thq-form-elm">
-              <div class="registro-thq-div-elm1">
-                <div class="registro-thq-label-elm1">
-                  <span class="registro-thq-text-elm13">Nombre completo</span>
-                </div>
-                <div class="registro-thq-container-elm16">
-                  <input
-                    type="text"
-                    placeholder="Juan Pérez"
-                    class="registro-thq-input-elm1"
-                  />
-                  <img
-                    src="{{ url_for('static', filename='public/user1201-t8p4.svg') }}"
-                    alt="User1201"
-                    class="registro-thq-user-elm"
-                  />
-                </div>
-              </div>
-              <div class="registro-thq-div-elm2">
-                <div class="registro-thq-label-elm2">
-                  <span class="registro-thq-text-elm14">
-                    Correo electrónico
-                  </span>
-                </div>
-                <div class="registro-thq-container-elm17">
-                  <input
-                    type="text"
-                    placeholder="tu@email.com"
-                    class="registro-thq-input-elm2"
-                  />
-                  <img
-                    src="{{ url_for('static', filename='public/mail1201-nerh.svg') }}"
-                    alt="Mail1201"
-                    class="registro-thq-mail-elm"
-                  />
-                </div>
-              </div>
-              <div class="registro-thq-div-elm3">
-                <div class="registro-thq-label-elm3">
-                  <span class="registro-thq-text-elm15">Contraseña</span>
-                </div>
-                <div class="registro-thq-container-elm18">
-                  <input
-                    type="text"
-                    placeholder="••••••••"
-                    class="registro-thq-input-elm3"
-                  />
-                  <img
-                    src="{{ url_for('static', filename='public/lock1201-w3h.svg') }}"
-                    alt="Lock1201"
-                    class="registro-thq-lock-elm1"
-                  />
-                </div>
-              </div>
-              <div class="registro-thq-div-elm4">
-                <div class="registro-thq-label-elm4">
-                  <span class="registro-thq-text-elm16">
-                    Confirmar contraseña
-                  </span>
-                </div>
-                <div class="registro-thq-container-elm19">
-                  <input
-                    type="text"
-                    placeholder="••••••••"
-                    class="registro-thq-input-elm4"
-                  />
-                  <img
-                    src="{{ url_for('static', filename='public/lock1201-x6b.svg') }}"
-                    alt="Lock1201"
-                    class="registro-thq-lock-elm2"
-                  />
-                </div>
-              </div>
-              <div class="registro-thq-div-elm5">
-                <div class="registro-thq-checkbox-elm"></div>
-                <div class="registro-thq-label-elm5">
-                  <span class="registro-thq-text-elm17">
-                    <span class="registro-thq-text-elm18">Acepto los</span>
-                    <span class="registro-thq-text-elm19">
-                      términos y condiciones
-                    </span>
-                    <span class="registro-thq-text-elm20">y la</span>
-                    <span>política de privacidad</span>
-                  </span>
-                </div>
-              </div>
+          </div>
+          <div class="con-thq-container-elm14">
+            <div class="con-thq-heading1-elm">
+              <span class="con-thq-text-elm12">Crea tu cuenta</span>
             </div>
-            <button class="registro-thq-button-elm1"
-              onclick="window.location.href='/'"> 
-              <span class="registro-thq-text-elm22">Crear Cuenta</span>
-            </button>
-            <div class="registro-thq-container-elm20">
-              <div class="registro-thq-container-elm21"></div>
-              <div class="registro-thq-span-elm2">
-                <span class="registro-thq-text-elm23">O regístrate con</span>
-              </div>
-              <div class="registro-thq-container-elm22"></div>
-            </div>
-            <div class="registro-thq-container-elm23">
-              <button class="registro-thq-button-elm2">
-                <img
-                  src="{{ url_for('static', filename='public/svg1201-1mls.svg') }}"
-                  alt="svg1201"
-                  class="registro-thq-svg-elm1"
-                />
-              </button>
-              <button class="registro-thq-button-elm3">
-                <img
-                  src="{{ url_for('static', filename='public/svg1201-fyf.svg') }}"
-                  alt="svg1201"
-                  class="registro-thq-svg-elm2"
-                />
-              </button>
-              <button class="registro-thq-button-elm4">
-                <img
-                  src="{{ url_for('static', filename='public/svg1202-wohq.svg') }}"
-                  alt="svg1202"
-                  class="registro-thq-svg-elm3"
-                />
-              </button>
-            </div>
-            <div class="registro-thq-container-elm24">
-              <span class="registro-thq-text-elm24">
-                <span class="registro-thq-text-elm25">
-                  ¿Ya tienes una cuenta?
-                </span>
-                  <button class="iniciodesesinmvil-thq-button-elm7"
-                    onclick="window.location.href='/'">   
-                    <span class="registro-thq-text-elm19">
-                       Inicia Sesión
-                    </span>
-                  </button>
+            <div class="con-thq-paragraph-elm1">
+              <span class="con-thq-text-elm13">
+                Registrate para empezar a cocinar
               </span>
             </div>
           </div>
+          <div class="con-thq-form-elm">
+            <div class="con-thq-container-elm15">
+              <div class="con-thq-label-elm1">
+                <span class="con-thq-text-elm14">Nombre completo</span>
+              </div>
+              <div class="con-thq-container-elm16">
+                <input type="text" placeholder="Juan Pérez" class="con-thq-input-elm1" />
+                <img src="{{ url_for('static', filename='public/user.svg') }}" alt="Icon1472"
+                  class="con-thq-icon-elm2" />
+              </div>
+            </div>
+            <div class="con-thq-container-elm17">
+              <div class="con-thq-label-elm2">
+                <span class="con-thq-text-elm15">Correo electrónico</span>
+              </div>
+              <div class="con-thq-container-elm18">
+                <input type="text" placeholder="tu@email.com" class="con-thq-input-elm2" />
+                <img src="{{ url_for('static', filename='public/mail.svg') }}" alt="Icon1473"
+                  class="con-thq-icon-elm3" />
+              </div>
+            </div>
+            <div class="con-thq-container-elm19">
+              <div class="con-thq-label-elm3">
+                <span class="con-thq-text-elm16">Contraseña</span>
+              </div>
+              <div class="con-thq-container-elm20">
+                <input type="text" placeholder="••••••••" class="con-thq-input-elm3" />
+                <img src="{{ url_for('static', filename='public/lock.svg') }}" alt="Icon1474"
+                  class="con-thq-icon-elm4" />
+              </div>
+            </div>
+            <div class="con-thq-container-elm21">
+              <div class="con-thq-label-elm4">
+                <span class="con-thq-text-elm17">Confirmar contraseña</span>
+              </div>
+              <div class="con-thq-container-elm22">
+                <input type="text" placeholder="••••••••" class="con-thq-input-elm4" />
+                <img src="{{ url_for('static', filename='public/lock.svg') }}" alt="Icon1475"
+                  class="con-thq-icon-elm5" />
+              </div>
+            </div>
+            <div class="con-thq-container-elm23">
+              <button class="con-thq-primitivebutton-elm"></button>
+              <div class="con-thq-label-elm5">
+                <span class="con-thq-text-elm18">
+                  <span class="con-thq-text-elm19">Acepto los</span>
+                  <span class="con-thq-text-elm20">
+                    términos y condiciones
+                  </span>
+                  <span class="con-thq-text-elm21">y la</span>
+                  <span>política de privacidad</span>
+                </span>
+              </div>
+            </div>
+            <button class="con-thq-button-elm1" onclick="window.location.href='/'">
+            <span class="con-thq-text-elm23">Crear Cuenta</span>
+            </button>
+          </div>
+          <div class="con-thq-container-elm24">
+            <div class="con-thq-paragraph-elm2">
+              <span class="con-thq-text-elm24">O registrarte con</span>
+            </div>
+            <div class="con-thq-container-elm25">
+              <button class="con-thq-button-elm2">
+                <img src="{{ url_for('static', filename='public/google.svg') }}" alt="Icon1476"
+                  class="con-thq-icon-elm6" />
+              </button>
+              <button class="con-thq-button-elm3">
+                <img src="{{ url_for('static', filename='public/facebook.svg') }}" alt="Icon1477"
+                  class="con-thq-icon-elm7" />
+              </button>
+              <button class="con-thq-button-elm4">
+                <img src="{{ url_for('static', filename='public/apple.svg') }}" alt="Icon1477"
+                  class="con-thq-icon-elm8" />
+              </button>
+            </div>
+          </div>
+          <div class="con-thq-paragraph-elm3">
+            <span class="con-thq-text-elm25">
+              <span class="con-thq-text-elm26">¿Ya tienes una cuenta?</span>
+              <button class="iniciodesesinmvil-thq-button-elm7" onclick="window.location.href='/'">
+                <span class="registro-thq-text-elm19">
+                  Inicia Sesión
+                </span>
+            </span>
+          </div>
         </div>
+      </div>
+
     </div>
-  </body>
+</body>
+
 </html>
