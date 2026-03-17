@@ -514,3 +514,40 @@
     font-size: 22px;
   }
 }
+
+/* ============================================
+   EYE TOGGLE BUTTON
+   ============================================ */
+
+/* Input de contraseña con espacio para el ojo */
+.con-thq-input-elm3,
+.con-thq-input-elm4 {
+  padding-right: 44px;
+}
+
+.con-thq-eye-btn {
+  top: 50%;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.con-thq-eye-btn:hover {
+  opacity: 0.8;
+}
+
+.con-thq-eye-icon {
+  width: 20px;
+  height: 20px;
+}

@@ -200,7 +200,7 @@
                                 Inicia sesión para continuar cocinando
                             </span>
                         </div>
-                        <div class="iniciodesesinmvil-thq-form-elm">
+                        <form class="iniciodesesinmvil-thq-form-elm" method="POST" action="/">
                             <div class="iniciodesesinmvil-thq-container-elm15">
                                 <div class="iniciodesesinmvil-thq-label-elm1">
                                     <span class="iniciodesesinmvil-thq-text-elm15">
@@ -208,8 +208,10 @@
                                     </span>
                                 </div>
                                 <div class="iniciodesesinmvil-thq-container-elm16">
-                                    <input type="text" placeholder="tu@email.com"
-                                        class="iniciodesesinmvil-thq-email-input-elm" />
+                                    <input type="email" id="email" name="email" placeholder="tu@email.com"
+                                        class="iniciodesesinmvil-thq-email-input-elm" required />
+
+
                                     <img src="{{ url_for('static', filename='public/mail.svg') }}" alt="Icon1511"
                                         class="iniciodesesinmvil-thq-icon-elm1" />
                                 </div>
@@ -221,19 +223,22 @@
                                     </span>
                                 </div>
                                 <div class="iniciodesesinmvil-thq-container-elm18">
-                                    <input type="text" placeholder="••••••••"
-                                        class="iniciodesesinmvil-thq-password-input-elm" />
+                                    <input type="password" id="password" name="password" placeholder="••••••••"
+                                        class="iniciodesesinmvil-thq-password-input-elm" required />
                                     <img src="{{ url_for('static', filename='public/lock.svg') }}" alt="Icon1511"
                                         class="iniciodesesinmvil-thq-icon-elm2" />
-                                    <button class="iniciodesesinmvil-thq-button-elm1">
-                                        <img src="{{ url_for('static', filename='public/eye.svg') }}" alt="Icon1511"
-                                            class="iniciodesesinmvil-thq-icon-elm3" />
+                                    <button type="button" id="togglePassword" class="iniciodesesinmvil-thq-button-elm1">
+
+                                        <img id="eyeIcon" src="{{ url_for('static', filename='public/eye.svg') }}"
+                                            alt="Icon1511" class="iniciodesesinmvil-thq-icon-elm3" />
+
                                     </button>
+
                                 </div>
                             </div>
                             <div class="iniciodesesinmvil-thq-div-elm">
                                 <div class="iniciodesesinmvil-thq-container-elm19">
-                                    <div class="iniciodesesinmvil-thq-checkbox-elm"></div>
+                                    <input type="checkbox" id="rememberMe" class="iniciodesesinmvil-thq-checkbox-elm">
                                     <div class="iniciodesesinmvil-thq-label-elm3">
                                         <span class="iniciodesesinmvil-thq-text-elm17">
                                             Recordarme
@@ -250,13 +255,20 @@
                                 </div>
                             </div>
 
-                            <button class="iniciodesesinmvil-thq-button-elm2"
-                                onclick="window.location.href='/dashboard'">
+                            <button type="submit" class="iniciodesesinmvil-thq-button-elm2">
                                 <span class="iniciodesesinmvil-thq-text-elm19">
                                     Iniciar Sesión
                                 </span>
                             </button>
-                        </div>
+                            {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                            <p style="color:red; text-align:center; margin-top:10px;">
+                                {{ messages[0] }}
+                            </p>
+                            {% endif %}
+                            {% endwith %}
+
+                        </form>
                         <div class="iniciodesesinmvil-thq-container-elm21">
                             <div class="iniciodesesinmvil-thq-container-elm22"></div>
                             <div class="iniciodesesinmvil-thq-text-elm20">
@@ -267,17 +279,10 @@
                             <div class="iniciodesesinmvil-thq-container-elm23"></div>
                         </div>
                         <div class="iniciodesesinmvil-thq-container-elm24">
-                            <button class="iniciodesesinmvil-thq-button-elm3">
+                            <button class="iniciodesesinmvil-thq-button-elm3"
+                                onclick="window.location.href='/login/google'">
                                 <img src="{{ url_for('static', filename='public/google.svg') }}" alt="Icon1511"
                                     class="iniciodesesinmvil-thq-icon-elm4" />
-                            </button>
-                            <button class="iniciodesesinmvil-thq-button-elm4">
-                                <img src="{{ url_for('static', filename='public/facebook.svg') }}" alt="Icon1511"
-                                    class="iniciodesesinmvil-thq-icon-elm5" />
-                            </button>
-                            <button class="iniciodesesinmvil-thq-button-elm5">
-                                <img src="{{ url_for('static', filename='public/apple.svg') }}" alt="Icon1511"
-                                    class="iniciodesesinmvil-thq-icon-elm6" />
                             </button>
                         </div>
                         <div class="iniciodesesinmvil-thq-paragraph-elm2">
@@ -298,6 +303,58 @@
                 </div>
             </div>
         </div>
+        <script>
+
+            const toggleBtn = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById("password");
+            const eyeIcon = document.getElementById("eyeIcon");
+
+            toggleBtn.addEventListener("click", function () {
+
+                if (passwordInput.type === "password") {
+
+                    passwordInput.type = "text";
+                    eyeIcon.src = "{{ url_for('static', filename='public/noeye.svg') }}";
+
+                } else {
+
+                    passwordInput.type = "password";
+                    eyeIcon.src = "{{ url_for('static', filename='public/eye.svg') }}";
+
+                }
+
+            });
+
+        </script>
+        <script>
+
+            const emailInput = document.getElementById("email");
+            const rememberCheckbox = document.getElementById("rememberMe");
+            const form = document.querySelector("form");
+
+            window.addEventListener("load", () => {
+
+                const savedEmail = localStorage.getItem("rememberedEmail");
+
+                if (savedEmail) {
+                    emailInput.value = savedEmail;
+                    rememberCheckbox.checked = true;
+                }
+
+            });
+
+            form.addEventListener("submit", () => {
+
+                if (rememberCheckbox.checked) {
+                    localStorage.setItem("rememberedEmail", emailInput.value);
+                } else {
+                    localStorage.removeItem("rememberedEmail");
+                }
+
+            });
+
+        </script>
+
 </body>
 
 </html>

@@ -87,3 +87,19 @@ py app.py
 http://127.0.0.1:5000
 
 ```
+## montaje BD mongo
+
+1. intalar dependencias
+``` 
+pip install pymongo flask-bcrypt python-dotenv
+
+python -m pip install "pymongo[srv]"
+```
+
+py -m pip install authlib requests
+
+py -m pip install flask-bcrypt
+py -m pip install Authlib
+py -m pip install requests
+pip install secure-smtplib
+
