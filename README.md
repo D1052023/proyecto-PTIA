@@ -1,4 +1,4 @@
-# 🍳 Proyecto PTIA – Sistema Inteligente de Recomendación de Recetas
+# proyecto-PTIA
 
 ---
 
