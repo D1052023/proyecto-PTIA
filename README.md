@@ -1,5 +1,7 @@
-# proyecto-PTIA
+# 🍳 Proyecto PTIA – Sistema Inteligente de Recomendación de Recetas
+
 ---
+
 ## 👥 Integrantes del Proyecto
 
 | Nombre                                     | Rol        |
@@ -9,97 +11,142 @@
 
 ---
 
+## 📌 Descripción
 
+Este proyecto implementa un sistema inteligente basado en **Aprendizaje Supervisado** que permite:
 
-## Descripción
+1. 📸 Recibir una imagen con ingredientes
+2. 🧠 Detectar automáticamente los ingredientes mediante un modelo **CNN con Transfer Learning (MobileNetV2)**
+3. 🍲 Recomendar recetas que coincidan con los ingredientes detectados
 
-Sistema basado en Aprendizaje Supervisado que:
+---
 
-1. Recibe una imagen con ingredientes
-2. Detecta los ingredientes usando un modelo CNN con Transfer Learning
-3. Recomienda recetas que contengan esos ingredientes
+## 🏗️ Arquitectura del Sistema
 
-## Arquitectura
-
-Arquitectura:
-
-Frontend (HTML) -> Flask API (Python) -> Modelo CNN (MobileNetV2) -> Motor de recomendación
-
-## Requisitos
-
-Python 3.10+
-
-Instalar dependencias:
+El sistema sigue una arquitectura modular:
 
 ```
+Frontend (HTML)
+        ↓
+Flask API (Python)
+        ↓
+Modelo CNN (MobileNetV2)
+        ↓
+Motor de Recomendación
+```
+
+---
+
+## ⚙️ Requisitos
+
+* Python 3.10 o superior
+* pip (gestor de paquetes)
+
+### 📦 Instalación de dependencias principales
+
+```bash
 pip install flask flask-sqlalchemy werkzeug
 ```
 
 ---
 
-## Estructura del Proyecto
-
-## 📂 Flat Project Structure
+## 🧪 Estructura del Proyecto
 
 ```
 📂 proyecto_PTIA
 ┣ 📂 proyecto_resetas/
-┃ ┣ 📂 static/                  # Archivos estáticos
-┃ ┃ ┣ 📂 css/                   # Hojas de estilo
+┃ ┣ 📂 static/
+┃ ┃ ┣ 📂 css/
 ┃ ┃ ┃ ┗ 🎨 style.css    
-┃ ┃ ┣ 📂 locales/               # Archivos de idioma
+┃ ┃ ┣ 📂 locales/
 ┃ ┃ ┃ ┗ 🟨 en.json
-┃ ┃ ┣ 📂 public/                # Archivos públicos del sitio
+┃ ┃ ┣ 📂 public/
 ┃ ┃ ┃ ┣ 🤖 robots.txt
 ┃ ┃ ┃ ┗ 🖼️ image.svg
-┃ ┣  📂 templates/             # Plantillas HTML
-┃ ┃   ┗ 🌐 archivo.html
-┃ ┣ 🐍 app.py                   # Aplicación principal
-┃ ┣ 🗄️ database.db              # Base de datos SQLite
-┣ 📂 venv/                      # Entorno virtual de Python
-┃ ┣ 📂 Include/
-┃ ┣ 📂 Lib/
-┃ ┣ 📂 Scripts/
-┃ ┗ ⚙️ pyvenv.cfg
+┃ ┣ 📂 templates/
+┃ ┃ ┗ 🌐 archivo.html
+┃ ┣ 🐍 app.py
+┃ ┣ 🗄️ database.db
+┣ 📂 venv/
 ┣ 🚫 .gitignore
 ┣ 📄 LICENSE
 ┗ 📄 README.md
 ```
+
 ---
 
-## Ejecutar el Sistema
+## 🚀 Ejecución del Sistema
 
-1. Entrenar el modelo:
+### 1️⃣ Entrenar el modelo
 
-```
+```bash
 py train_model.py
 ```
 
-2. Ejecutar la aplicación:
+### 2️⃣ Ejecutar la aplicación
 
-```
+```bash
 py app.py
 ```
 
-3. Abrir en navegador:
+### 3️⃣ Abrir en el navegador
 
 ```
 http://127.0.0.1:5000
-
 ```
-## montaje BD mongo
 
-1. intalar dependencias
-``` 
+---
+
+## 🍃 Configuración de Base de Datos (MongoDB)
+
+### 📦 Instalación de dependencias
+
+```bash
 pip install pymongo flask-bcrypt python-dotenv
-
 python -m pip install "pymongo[srv]"
+pip install authlib requests secure-smtplib
 ```
 
-py -m pip install authlib requests
+### 🔐 Dependencias adicionales (autenticación y seguridad)
 
+```bash
 py -m pip install flask-bcrypt
 py -m pip install Authlib
 py -m pip install requests
-pip install secure-smtplib
 py -m pip install python-dotenv
+```
+
+---
+
+## 🔐 Características adicionales
+
+* 🔑 Autenticación de usuarios
+* 🔒 Encriptación de contraseñas con **Flask-Bcrypt**
+* 🌐 Integración con servicios externos mediante **Authlib**
+* 📧 Posibilidad de envío de correos (SMTP)
+
+---
+
+## 📌 Mejoras futuras
+
+* 📱 Interfaz web más moderna y responsiva
+* 🤖 Mejora del modelo de detección de ingredientes
+* 📊 Sistema de recomendaciones más preciso (IA híbrida)
+* ☁️ Despliegue en la nube
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia especificada en el archivo `LICENSE`.
+
+---
+
+## 💡 Notas
+
+* Se recomienda usar un entorno virtual (`venv`) para evitar conflictos de dependencias
+* Verificar que MongoDB esté correctamente configurado si se usa en lugar de SQLite
+
+---
+
+✨ *Proyecto académico enfocado en la aplicación de Inteligencia Artificial en la vida cotidiana.*
