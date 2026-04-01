@@ -13,11 +13,36 @@
 
 ## 📌 Descripción
 
-Este proyecto implementa un sistema inteligente basado en **Aprendizaje Supervisado** que permite:
+Este proyecto implementa un Sistema Inteligente de Recomendación de Recetas que utiliza técnicas avanzadas de Inteligencia Artificial, combinando Visión por Computador y Modelos de Lenguaje.
 
-1. 📸 Recibir una imagen con ingredientes
-2. 🧠 Detectar automáticamente los ingredientes mediante un modelo **CNN con Transfer Learning (MobileNetV2)**
-3. 🍲 Recomendar recetas que coincidan con los ingredientes detectados
+El sistema permite:
+
+📸 Subir una imagen de ingredientes
+🧠 Detectar automáticamente los ingredientes presentes mediante un modelo de Transfer Learning basado en MobileNetV2
+🍲 Recomendar recetas utilizando un motor inteligente que compara ingredientes detectados con la base de datos de recetas
+
+El enfoque principal está basado en Aprendizaje Supervisado para la detección de ingredientes y un Sistema de Recomendación Basado en Contenido (Content-Based Filtering) para la selección inteligente de recetas relevantes.
+
+---
+## 🧠 Metodología de Inteligencia Artificial
+El sistema incorpora tres componentes fundamentales:
+
+1️⃣ Visión por Computador – MobileNetV2 (Transfer Learning)
+Tipo de IA: 
+- Red Neuronal Convolucional (CNN)
+- Tipo de Aprendizaje: Supervisado
+- Uso: Clasificación de imágenes de ingredientes
+- Método: Transfer Learning sobre MobileNetV2 para reducir costo de entrenamiento
+
+2️⃣ Procesamiento de Lenguaje – Sentence Transformers
+- Tipo de IA: Modelo Embedding No Supervisado
+- Uso: Convertir texto e ingredientes en vectores semánticos
+- Permite medir similitud entre recetas
+
+3️⃣ Motor de Recomendación – Content-Based Filtering
+- Tipo de aprendizaje: No supervisado
+- Uso: Recomendación de recetas mediante similitud de embeddings
+- Métrica: Similitud del coseno
 
 ---
 
@@ -26,13 +51,19 @@ Este proyecto implementa un sistema inteligente basado en **Aprendizaje Supervis
 El sistema sigue una arquitectura modular:
 
 ```
-Frontend (HTML)
+Usuario (Frontend)
         ↓
-Flask API (Python)
+Formulario en Flask
         ↓
-Modelo CNN (MobileNetV2)
+Procesador de imágenes (MobileNetV2)
         ↓
-Motor de Recomendación
+Extracción de Ingredientes
+        ↓
+Motor de Embeddings (Sentence Transformers)
+        ↓
+Motor de Recomendación (Similitud)
+        ↓
+Recetas recomendadas
 ```
 
 ---
@@ -54,19 +85,39 @@ pip install flask flask-sqlalchemy werkzeug
 
 ```
 📂 proyecto_PTIA
-┣ 📂 proyecto_resetas/
+┣ 📂 proyecto_recetas/
 ┃ ┣ 📂 static/
 ┃ ┃ ┣ 📂 css/
-┃ ┃ ┃ ┗ 🎨 style.css    
+┃ ┃ ┃ ┗ 🎨 style.css
 ┃ ┃ ┣ 📂 locales/
 ┃ ┃ ┃ ┗ 🟨 en.json
+┃ ┃ ┣ 📂 js/
+┃ ┃ ┃ ┗ ⚡ archive.js
 ┃ ┃ ┣ 📂 public/
 ┃ ┃ ┃ ┣ 🤖 robots.txt
 ┃ ┃ ┃ ┗ 🖼️ image.svg
+┃ ┃ ┣ 📂 uploads/               # Fotos de usuarios
+┃ ┃ ┗ 📂 img/                   # Imágenes internas
 ┃ ┣ 📂 templates/
-┃ ┃ ┗ 🌐 archivo.html
-┃ ┣ 🐍 app.py
-┃ ┣ 🗄️ database.db
+┃ ┃ ┣ 🌐 archivo.html
+┃ ┃ ┣ 🌐 recomendar.html         # Formulario de recomendaciones
+┃ ┃ ┗ 🌐 resultados.html         # Recetas resultantes
+┃ ┣ 📂 models/
+┃ ┃ ┣ 🧠 embeddings_nlp.npy
+┃ ┃ ┣ 🧠 embeddings_clip.npy (opcional)
+┃ ┃ ┣ 🧩 modelo_nlp.py           # Embeddings de texto
+┃ ┃ ┣ 🧩 modelo_clip.py          # Clasificación de imágenes
+┃ ┃ ┗ 🧩 recomendador.py         # Motor de similitud
+┃ ┣ 📂 data/
+┃ ┃ ┣ 📜 recetas.json
+┃ ┃ ┣ 📜 recetas_embeddings.json
+┃ ┃ ┗ 📜 etiquetas_ingredientes.json
+┃ ┣ 📂 utils/
+┃ ┃ ┣ 🔧 similarity.py
+┃ ┃ ┗ 🔧 preprocess.py
+┃ ┣ 🐍 app.py                    # Aplicación Flask
+┃ ┣ 🗄️ database.py               # Conexión a MongoDB
+┃ ┗ 📄 requirements.txt
 ┣ 📂 venv/
 ┣ 🚫 .gitignore
 ┣ 📄 LICENSE
