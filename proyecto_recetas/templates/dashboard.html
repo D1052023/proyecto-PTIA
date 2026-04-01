@@ -1,11 +1,215 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Dashboard</title>
+  <!-- Anti-parpadeo preferencias -->
+  <script>
+    (function() {
+      try {
+        const p = JSON.parse(localStorage.getItem('recetafacil_prefs')) || {};
+        const h = document.documentElement;
+        if (p.dark)     h.classList.add('dark');
+        if (p.compact)  h.classList.add('compact');
+        if (p.fontSize) h.classList.add('font-' + p.fontSize);
+      } catch(e) {}
+    })();
+  </script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecetaFácil – Dashboard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/preferences.css') }}">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { font-family: Inter, sans-serif; height: 100%; overflow: hidden; background: #f4f6f8; }
+    .root { display: flex; height: 100vh; overflow: hidden; }
+    .sidebar { width: 220px; min-width: 220px; height: 100vh; background: #4caf50; display: flex; flex-direction: column; flex-shrink: 0; }
+    .sidebar-logo { height: 68px; display: flex; align-items: center; gap: 11px; padding: 0 18px; border-bottom: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+    .logo-circle { width: 34px; height: 34px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-circle svg { width: 18px; height: 18px; }
+    .logo-name { color: #fff; font-size: 17px; font-weight: 700; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 3px; flex: 1; padding: 10px; }
+    .nav-btn { width: 100%; height: 42px; display: flex; align-items: center; gap: 11px; padding: 0 13px; border: none; border-radius: 9px; background: transparent; cursor: pointer; color: #fff; font-size: 14px; font-weight: 500; font-family: Inter, sans-serif; transition: background 0.18s; text-align: left; }
+    .nav-btn.active { background: rgba(255,255,255,0.2); }
+    .nav-btn:hover   { background: rgba(255,255,255,0.13); }
+    .nav-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .sidebar-footer { padding: 10px; border-top: 1px solid rgba(255,255,255,0.18); flex-shrink: 0; }
+    .main { flex: 1; min-width: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    .main-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .content { padding: 28px 36px; display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0; }
+    .heading h1 { color: #101828; font-size: 24px; font-weight: 700; line-height: 1.25; }
+    .heading p  { color: #6b7280; font-size: 13.5px; line-height: 1.5; margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: 1fr 272px; gap: 16px; flex: 1; min-height: 0; }
+    .col-left { display: grid; grid-template-rows: auto auto 1fr; gap: 14px; min-height: 0; }
+    .card { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card-ingr { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+    .card-label { color: #364153; font-size: 12.5px; font-weight: 600; }
+    .input-row { display: flex; gap: 10px; align-items: center; }
+    .input-wrap { flex: 1; position: relative; display: flex; align-items: center; }
+    .input-wrap svg { position: absolute; left: 12px; width: 14px; height: 14px; opacity: 0.36; pointer-events: none; }
+    .txt-input { width: 100%; height: 40px; padding: 0 12px 0 36px; font-size: 13.5px; font-family: Inter, sans-serif; color: #101828; border: 1px solid #d1d5dc; border-radius: 9px; background: #f9fafb; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .txt-input::placeholder { color: rgba(0,0,0,0.3); }
+    .txt-input:focus { border-color: #4caf50; background: #fff; box-shadow: 0 0 0 3px rgba(76,175,80,0.13); }
+    .btn-add { height: 40px; padding: 0 18px; flex-shrink: 0; background: #4caf50; border: none; border-radius: 9px; color: #fff; font-size: 13.5px; font-weight: 600; font-family: Inter, sans-serif; cursor: pointer; white-space: nowrap; transition: background 0.18s, transform 0.1s; }
+    .btn-add:hover  { background: #43a047; }
+    .btn-add:active { transform: scale(0.97); }
+    #chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { display: flex; align-items: center; gap: 5px; background: #e8f5e9; color: #2e7d32; font-size: 11.5px; font-weight: 500; font-family: Inter, sans-serif; padding: 3px 10px; border-radius: 9999px; border: 1px solid #c8e6c9; animation: chipIn .18s ease; }
+    @keyframes chipIn { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:scale(1)} }
+    .chip button { background:none; border:none; cursor:pointer; color:#4caf50; font-size:13px; line-height:1; padding:0; transition:color .15s; }
+    .chip button:hover { color:#e53935; }
+    .card-cam { padding: 18px 22px; display: flex; align-items: center; gap: 20px; border: 1.5px dashed #c8e6c9; transition: border-color .2s, background .2s; }
+    .card-cam:hover { border-color: #81c784; background: #fafffe; }
+    .cam-icon-wrap { width: 52px; height: 52px; border-radius: 14px; background: #e8f5e9; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s; }
+    .card-cam:hover .cam-icon-wrap { background: #c8e6c9; }
+    .cam-icon-wrap svg { width: 26px; height: 26px; color: #4caf50; }
+    .cam-text { flex: 1; min-width: 0; }
+    .cam-title { color: #101828; font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+    .cam-desc  { color: #6b7280; font-size: 12.5px; line-height: 1.4; }
+    .btn-cam { height: 36px; padding: 0 16px; flex-shrink: 0; border: 1.5px solid #4caf50; border-radius: 8px; background: transparent; color: #4caf50; font-size: 13px; font-weight: 600; font-family: Inter, sans-serif; cursor: pointer; transition: background .2s, color .2s; white-space: nowrap; }
+    .btn-cam:hover { background: #4caf50; color: #fff; }
+    .card-tips { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .tips-header { display: flex; align-items: center; gap: 8px; }
+    .tips-header svg { width: 15px; height: 15px; color: #f59e0b; flex-shrink: 0; }
+    .tips-title { color: #364153; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; }
+    .tip-card { background: #f9fafb; border-radius: 11px; border: 1px solid #f0f0f0; padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 7px; transition: border-color .2s, background .2s; cursor: pointer; }
+    .tip-card:hover { background: #f0fdf4; border-color: #d1fae5; }
+    .tip-emoji { font-size: 22px; line-height: 1; }
+    .tip-name { color: #101828; font-size: 13px; font-weight: 600; line-height: 1.3; }
+    .tip-desc { color: #6b7280; font-size: 12px; line-height: 1.45; }
+    .tip-tag { display: inline-flex; align-items: center; background: #e8f5e9; color: #2e7d32; font-size: 11px; font-weight: 500; font-family: Inter, sans-serif; padding: 2px 8px; border-radius: 9999px; border: 1px solid #c8e6c9; width: fit-content; margin-top: 2px; }
+    .col-right { display: flex; flex-direction: column; min-height: 0; }
+    .card-panel { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
+    .panel-hdr { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .panel-title { color: #364153; font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+    #counter { color: #4caf50; font-size: 11.5px; font-weight: 600; background: #e8f5e9; padding: 2px 9px; border-radius: 9999px; }
+    #list { display: flex; flex-direction: column; gap: 6px; flex: 1; overflow-y: auto; min-height: 0; }
+    .item { display: flex; align-items: center; justify-content: space-between; padding: 8px 11px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; font-size: 13px; font-weight: 500; color: #364153; font-family: Inter, sans-serif; animation: itemIn .18s ease; flex-shrink: 0; }
+    @keyframes itemIn { from{opacity:0;transform:translateX(8px)} to{opacity:1;transform:translateX(0)} }
+    .item button { background:none; border:none; cursor:pointer; color:#d1d5db; font-size:15px; padding:0; transition:color .15s; }
+    .item button:hover { color:#e53935; }
+    #empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #9ca3af; font-size: 12.5px; font-family: Inter, sans-serif; text-align: center; }
+    .empty-icon-wrap { width: 48px; height: 48px; border-radius: 50%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; }
+    .empty-icon-wrap svg { width: 22px; height: 22px; color: #d1d5db; }
+    .divider { height: 1px; background: #f0f0f0; flex-shrink: 0; }
+    .btn-recipes { width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 7px; flex-shrink: 0; background: #4caf50; border: none; border-radius: 10px; color: #fff; font-size: 13.5px; font-weight: 600; font-family: Inter, sans-serif; cursor: pointer; transition: background .2s, transform .1s, opacity .2s; }
+    .btn-recipes:hover:not(:disabled)  { background: #43a047; }
+    .btn-recipes:active:not(:disabled) { transform: scale(.98); }
+    .btn-recipes:disabled { opacity: .38; cursor: not-allowed; }
+    .hint { color: #b0b7c3; font-size: 11px; text-align: center; line-height: 1.4; font-family: Inter, sans-serif; flex-shrink: 0; }
+    #toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; font-size: 13px; font-weight: 500; font-family: Inter, sans-serif; padding: 10px 16px; border-radius: 9px; z-index: 9999; opacity: 0; transform: translateY(10px); transition: opacity .22s, transform .22s; pointer-events: none; }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .tips-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 720px) { .sidebar { width: 60px; min-width: 60px; } .sidebar-logo { justify-content: center; padding: 0; } .logo-name { display: none; } .nav-btn { justify-content: center; padding: 0; } .nav-btn span { display: none; } .content { padding: 18px 14px; } }
+    @media (max-width: 520px) { .card-cam { flex-direction: column; text-align: center; } .tips-grid { grid-template-columns: 1fr 1fr; } .input-row { flex-wrap: wrap; } .btn-add { width: 100%; } }
+  </style>
 </head>
 <body>
-    <h2>Bienvenido a RecetaFácil</h2>
-    <p>Has iniciado sesión correctamente.</p>
-    <a href="/logout">Cerrar sesión</a>
+<div class="root">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+        </svg>
+      </div>
+      <span class="logo-name">RecetaFácil</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Recetas</span>
+      </button>
+      <button class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Favoritos</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-btn" onclick="window.location.href='/profile'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi Perfil</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-scroll">
+      <div class="content">
+        <div class="heading">
+          <h1>Cocina inteligente con lo que tienes</h1>
+          <p>Ingresa los ingredientes y descubre recetas increíbles al instante</p>
+        </div>
+        <div class="grid">
+          <div class="col-left">
+            <div class="card card-ingr">
+              <span class="card-label">Agregar ingredientes</span>
+              <div class="input-row">
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input id="ing-input" type="text" placeholder="Ej. Tomates, Cebolla, Arroz..." class="txt-input" />
+                </div>
+                <button class="btn-add" onclick="add()">Agregar</button>
+              </div>
+              <div id="chips"></div>
+            </div>
+            <div class="card card-cam">
+              <div class="cam-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+              <div class="cam-text">
+                <p class="cam-title">Detectar con cámara</p>
+                <p class="cam-desc">Toma una foto a tu refrigerador para identificar ingredientes automáticamente</p>
+              </div>
+              <button class="btn-cam">Abrir cámara</button>
+            </div>
+            <div class="card card-tips">
+              <div class="tips-header">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a7 7 0 0 1 5.292 11.573C16.254 14.84 15.5 16.37 15.5 18H8.5c0-1.63-.754-3.16-1.792-4.427A7 7 0 0 1 12 2zm3.5 17.5H8.5l.5 2h6l.5-2z"/></svg>
+                <span class="tips-title">Combinaciones populares</span>
+              </div>
+              <div class="tips-grid" id="tips-grid"></div>
+            </div>
+          </div>
+          <div class="col-right">
+            <div class="card card-panel">
+              <div class="panel-hdr">
+                <span class="panel-title">Tus Ingredientes</span>
+                <span id="counter">0 agregados</span>
+              </div>
+              <div id="list">
+                <div id="empty">
+                  <div class="empty-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21h6"/></svg>
+                  </div>
+                  <span>Aún no hay ingredientes.<br>¡Empieza agregando uno!</span>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <button class="btn-recipes" id="btn-recipes" disabled>
+                Ver recetas recomendadas
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <p class="hint">Haz clic para ver tus recetas personalizadas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 </html>

@@ -1,0 +1,633 @@
+/* ============================================
+   DASHBOARD – RECETAFÁCIL
+   Paleta: verde #4caf50 / fondo #f4f6f8
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  font-family: Inter, sans-serif;
+  height: 100%;
+  overflow: hidden;
+  background: #f4f6f8;
+}
+
+/* ── Layout raíz ───────────────────────────── */
+.root {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ───────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  height: 100vh;
+  background: #4caf50;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.logo-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-circle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.logo-name {
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  padding: 10px;
+}
+
+.nav-btn {
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 13px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: Inter, sans-serif;
+  text-align: left;
+  transition: background 0.18s;
+}
+
+.nav-btn svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.nav-btn:hover         { background: rgba(255, 255, 255, 0.13); }
+.nav-btn--active       { background: rgba(255, 255, 255, 0.2); }
+
+.sidebar-footer {
+  padding: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+}
+
+/* ── MAIN ──────────────────────────────────── */
+.main {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  padding: 28px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Encabezado ────────────────────────────── */
+.heading h1 {
+  color: #101828;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.heading p {
+  color: #6b7280;
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ── Grid principal ────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 272px;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.col-left {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 14px;
+  min-height: 0;
+}
+
+.col-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Cards base ────────────────────────────── */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* ── Card: Ingredientes ────────────────────── */
+.card--ingredients {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-label {
+  color: #364153;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  width: 14px;
+  height: 14px;
+  opacity: 0.36;
+  pointer-events: none;
+}
+
+.text-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 36px;
+  font-size: 13.5px;
+  font-family: Inter, sans-serif;
+  color: #101828;
+  border: 1px solid #d1d5dc;
+  border-radius: 9px;
+  background: #f9fafb;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.text-input::placeholder { color: rgba(0, 0, 0, 0.3); }
+
+.text-input:focus {
+  border-color: #4caf50;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.13);
+}
+
+.btn-add {
+  height: 40px;
+  padding: 0 18px;
+  flex-shrink: 0;
+  background: #4caf50;
+  border: none;
+  border-radius: 9px;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: Inter, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s, transform 0.1s;
+}
+
+.btn-add:hover  { background: #43a047; }
+.btn-add:active { transform: scale(0.97); }
+
+/* Chips */
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: Inter, sans-serif;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid #c8e6c9;
+  animation: chipIn 0.18s ease;
+}
+
+.chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4caf50;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.chip button:hover { color: #e53935; }
+
+@keyframes chipIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Card: Cámara ──────────────────────────── */
+.card--camera {
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1.5px dashed #c8e6c9;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.card--camera:hover {
+  border-color: #81c784;
+  background: #fafffe;
+}
+
+.camera-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #e8f5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.card--camera:hover .camera-icon-wrap { background: #c8e6c9; }
+
+.camera-icon-wrap svg {
+  width: 26px;
+  height: 26px;
+  color: #4caf50;
+}
+
+.camera-text { flex: 1; min-width: 0; }
+
+.camera-title {
+  color: #101828;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.camera-desc {
+  color: #6b7280;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.btn-camera {
+  height: 36px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  border: 1.5px solid #4caf50;
+  border-radius: 8px;
+  background: transparent;
+  color: #4caf50;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: Inter, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-camera:hover {
+  background: #4caf50;
+  color: #fff;
+}
+
+/* ── Card: Tips ────────────────────────────── */
+.card--tips {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tips-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tips-header svg {
+  width: 15px;
+  height: 15px;
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.tips-title {
+  color: #364153;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1;
+}
+
+.tip-card {
+  background: #f9fafb;
+  border-radius: 11px;
+  border: 1px solid #f0f0f0;
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.tip-card:hover {
+  background: #f0fdf4;
+  border-color: #d1fae5;
+}
+
+.tip-emoji  { font-size: 22px; line-height: 1; }
+.tip-name   { color: #101828; font-size: 13px; font-weight: 600; line-height: 1.3; }
+.tip-desc   { color: #6b7280; font-size: 12px; line-height: 1.45; }
+
+.tip-tag {
+  display: inline-flex;
+  align-items: center;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: Inter, sans-serif;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid #c8e6c9;
+  width: fit-content;
+  margin-top: 2px;
+}
+
+/* ── Card: Panel derecho ───────────────────── */
+.card--panel {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  color: #364153;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.counter-badge {
+  color: #4caf50;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #e8f5e9;
+  padding: 2px 9px;
+  border-radius: 9999px;
+}
+
+.ingredients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Item individual */
+.ingredient-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 11px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  font-weight: 500;
+  color: #364153;
+  font-family: Inter, sans-serif;
+  flex-shrink: 0;
+  animation: itemIn 0.18s ease;
+}
+
+.ingredient-item button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d1d5db;
+  font-size: 15px;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.ingredient-item button:hover { color: #e53935; }
+
+@keyframes itemIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Estado vacío */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #9ca3af;
+  font-size: 12.5px;
+  font-family: Inter, sans-serif;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon svg {
+  width: 22px;
+  height: 22px;
+  color: #d1d5db;
+}
+
+/* Divisor */
+.divider {
+  height: 1px;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+/* Botón ver recetas */
+.btn-recipes {
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  background: #4caf50;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: Inter, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
+}
+
+.btn-recipes:hover:not(:disabled)  { background: #43a047; }
+.btn-recipes:active:not(:disabled) { transform: scale(0.98); }
+.btn-recipes:disabled              { opacity: 0.38; cursor: not-allowed; }
+
+.panel-hint {
+  color: #b0b7c3;
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.4;
+  font-family: Inter, sans-serif;
+  flex-shrink: 0;
+}
+
+/* ── Toast ─────────────────────────────────── */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: Inter, sans-serif;
+  padding: 10px 16px;
+  border-radius: 9px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.22s, transform 0.22s;
+  pointer-events: none;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ────────────────────────────── */
+@media (max-width: 900px) {
+  .dashboard-grid        { grid-template-columns: 1fr; }
+  .tips-grid             { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .sidebar               { width: 60px; min-width: 60px; }
+  .sidebar-logo          { justify-content: center; padding: 0; }
+  .logo-name             { display: none; }
+  .nav-btn               { justify-content: center; padding: 0; }
+  .nav-btn span          { display: none; }
+  .content               { padding: 18px 14px; }
+}
+
+@media (max-width: 520px) {
+  .card--camera          { flex-direction: column; text-align: center; }
+  .tips-grid             { grid-template-columns: 1fr 1fr; }
+  .input-row             { flex-wrap: wrap; }
+  .btn-add               { width: 100%; }
+}

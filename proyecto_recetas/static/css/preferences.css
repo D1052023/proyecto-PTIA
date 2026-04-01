@@ -1,0 +1,148 @@
+/* ═══════════════════════════════════════════
+   MODO OSCURO  –  clase .dark en <html>
+   ═══════════════════════════════════════════ */
+
+/* Transición suave al activar/desactivar */
+body, .card, .info-field, .lang-field, .toggle-row,
+.btn-edit, .btn-cancel, .btn-logout,
+.modal-box, .photo-modal-box, .drop-zone {
+  transition:
+    background-color 0.25s ease,
+    border-color     0.25s ease,
+    color            0.22s ease;
+}
+
+html.dark body { background: #0f1117; }
+html.dark .root { background: #0f1117; }
+
+html.dark .card { background: #1a1d27; border-color: #2e3249; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+
+html.dark .heading h1,
+html.dark .profile-name,
+html.dark .section-title,
+html.dark .toggle-name,
+html.dark .field-value,
+html.dark .lang-value,
+html.dark .stat-value,
+html.dark .stats-title,
+html.dark .modal-box h2 { color: #f0f2ff; }
+
+html.dark .heading p,
+html.dark .profile-since,
+html.dark .section-sub,
+html.dark .toggle-desc,
+html.dark .field-label,
+html.dark .lang-label,
+html.dark .stat-label,
+html.dark .modal-box p { color: #8b90a7; }
+
+html.dark .info-field { background: #23263a; border-color: #2e3249; }
+html.dark .info-field:hover { border-color: #3e4260; }
+html.dark .editing .info-field { background: #1e2133; border-color: #4caf50; }
+html.dark .field-input { color: #f0f2ff; background: transparent; }
+
+html.dark .lang-field { background: #23263a; border-color: #2e3249; }
+html.dark .lang-field.editing { background: #1e2133; border-color: #4caf50; }
+html.dark .lang-select { color: #f0f2ff; background: transparent; }
+
+html.dark .stats-section { border-top-color: #2e3249; }
+html.dark .stat-row { border-bottom-color: #23263a; }
+
+html.dark .toggle-row { background: #1e2133; border-color: #2e3249; }
+html.dark .toggle-row:hover { background: #1e2a1f; border-color: #2d4a30; }
+
+html.dark .btn-edit { background: #23263a; border-color: #2e3249; color: #8b90a7; }
+html.dark .btn-edit:hover { border-color: #4caf50; color: #4caf50; background: #1a2e1b; }
+
+html.dark .btn-cancel { background: #23263a; border-color: #2e3249; color: #8b90a7; }
+html.dark .btn-cancel:hover { background: #2e3249; }
+
+html.dark .btn-logout { border-color: #7f2222; color: #f87171; }
+html.dark .btn-logout:hover { background: #2a1a1a; border-color: #f87171; }
+
+html.dark .modal-box,
+html.dark .photo-modal-box { background: #1a1d27; border: 1px solid #2e3249; }
+html.dark .modal-icon { background: #2a1a1a; border-color: #7f2222; }
+html.dark .btn-modal-cancel { background: #23263a; border-color: #2e3249; color: #8b90a7; }
+html.dark .btn-modal-cancel:hover { background: #2e3249; }
+
+html.dark .drop-zone { background: #23263a; border-color: #2d4a30; }
+html.dark .drop-zone:hover,
+html.dark .drop-zone.drag { background: #1a2e1b; border-color: #4caf50; }
+html.dark .drop-zone span { color: #8b90a7; }
+
+html.dark #toast { background: #e8f5e9; color: #1b5e20; }
+
+html.dark .main-scroll::-webkit-scrollbar-track { background: #0f1117; }
+html.dark .main-scroll::-webkit-scrollbar-thumb { background: #2e3249; border-radius: 4px; }
+html.dark .main-scroll::-webkit-scrollbar-thumb:hover { background: #3e4260; }
+
+/* ═══════════════════════════════════════════
+   VISTA COMPACTA  –  clase .compact en <html>
+   ═══════════════════════════════════════════ */
+
+html.compact .content { padding: 16px 22px; gap: 10px; }
+html.compact .card { border-radius: 10px; }
+html.compact .profile-card { padding: 18px 16px 14px; }
+html.compact .avatar-ring { width: 80px; height: 80px; }
+html.compact .avatar-placeholder { font-size: 28px; }
+html.compact .avatar-edit-btn { width: 26px; height: 26px; }
+html.compact .avatar-edit-btn svg { width: 11px; height: 11px; }
+html.compact .profile-name { font-size: 15px; }
+html.compact .profile-since { font-size: 11px; margin-bottom: 12px; }
+html.compact .btn-logout { height: 36px; font-size: 12px; margin-top: 10px; }
+html.compact .section-card { padding: 14px 18px; }
+html.compact .section-header { margin-bottom: 12px; }
+html.compact .section-title { font-size: 14px; }
+html.compact .info-grid { gap: 8px; }
+html.compact .info-field { padding: 8px 10px; gap: 8px; }
+html.compact .field-icon { width: 28px; height: 28px; border-radius: 7px; }
+html.compact .field-icon svg { width: 13px; height: 13px; }
+html.compact .field-label { font-size: 10px; }
+html.compact .field-value,
+html.compact .field-input { font-size: 13px; }
+html.compact .toggle-row { padding: 10px 12px; margin-bottom: 5px; border-radius: 9px; }
+html.compact .toggle-name { font-size: 12.5px; }
+html.compact .toggle-desc { font-size: 11px; }
+html.compact .toggle-switch { width: 36px; height: 20px; }
+html.compact .toggle-track::before { width: 14px; height: 14px; left: 3px; top: 3px; }
+html.compact input:checked + .toggle-track::before { transform: translateX(16px); }
+html.compact .lang-grid { gap: 8px; }
+html.compact .lang-field { padding: 8px 10px; gap: 8px; }
+html.compact .lang-icon { width: 28px; height: 28px; }
+html.compact .lang-label { font-size: 10px; }
+html.compact .lang-value,
+html.compact .lang-select { font-size: 13px; }
+html.compact .right-col { gap: 10px; }
+html.compact .heading h1 { font-size: 20px; }
+html.compact .heading p { font-size: 12.5px; }
+html.compact .grid { gap: 12px; }
+html.compact .btn-save-all { height: 38px; padding: 0 22px; font-size: 13px; }
+
+/* ═══════════════════════════════════════════
+   TAMAÑO DE FUENTE  –  clases .font-* en <html>
+   ═══════════════════════════════════════════ */
+
+.font-size-controls {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.font-size-btn {
+  width: 28px; height: 28px; border-radius: 8px;
+  border: 1.5px solid #d1d5db; background: #fff; color: #374151;
+  font-size: 16px; font-weight: 600; font-family: Inter, sans-serif;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.font-size-btn:hover { background: #f3f4f6; }
+#font-size-label {
+  font-size: 13px; font-weight: 600; color: #374151;
+  min-width: 48px; text-align: center;
+}
+
+html.font-small  .main { zoom: 0.88; }
+html.font-normal .main { zoom: 1;    }
+html.font-large  .main { zoom: 1.14; }
+
+html.dark .font-size-btn { background: #23263a; border-color: #2e3249; color: #8b90a7; }
+html.dark .font-size-btn:hover { background: #2e3249; }
+html.dark #font-size-label { color: #f0f2ff; }

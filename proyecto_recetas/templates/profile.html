@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecetaFácil – Mi Perfil</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/preferences.css') }}">
+</head>
+<body>
+<div class="root">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <span class="logo-name">RecetaFácil</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn" onclick="window.location.href='/dashboard'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Recetas</span>
+      </button>
+      <button class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Favoritos</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi Perfil</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-scroll">
+      <div class="content">
+
+        <div class="heading">
+          <h1>Mi Perfil</h1>
+          <p>Gestiona tu información personal y preferencias de la aplicación</p>
+        </div>
+
+        <div class="grid">
+
+          <!-- ══ PANEL IZQUIERDO ══ -->
+          <div class="card profile-card">
+
+            <!-- Foto -->
+            <div class="avatar-wrap">
+              <div class="avatar-ring" id="avatar-ring">
+                <img id="avatar-img" src="{{ user.photo if user.photo else '' }}" class="{{ 'show-avatar' if user.photo else 'hide-avatar' }}">
+                <span id="avatar-placeholder">{{ user.name[0] }}</span>
+              </div>
+              <button class="avatar-edit-btn" onclick="openPhotoModal()" title="Cambiar foto">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+                </svg>
+              </button>
+            </div>
+
+            <p class="profile-name" id="display-name">{{ user.name }}</p>
+            <p class="profile-since">Usuario desde {{ user.fecha_registro }}</p>
+
+            <!-- Cerrar sesión -->
+            <button class="btn-logout" onclick="openLogoutModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Cerrar Sesión
+            </button>
+          </div>
+
+          <!-- ══ PANEL DERECHO ══ -->
+          <div class="right-col">
+
+            <!-- Información Personal -->
+            <div class="card section-card">
+              <div class="section-header">
+                <div>
+                  <p class="section-title">Información Personal</p>
+                  <p class="section-sub">Tu información de contacto y ubicación</p>
+                </div>
+                <button class="btn-edit" id="btn-edit-info" onclick="toggleEdit()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Editar
+                </button>
+              </div>
+
+              <div class="info-grid" id="info-grid">
+                <!-- Nombre -->
+                <div class="info-field" id="field-nombre">
+                  <div class="field-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <div class="field-body">
+                    <p class="field-label">Nombre completo</p>
+                    <p class="field-value" id="val-nombre">{{ user.name }}</p>
+                    <input class="field-input" id="inp-nombre" type="text" value="{{ user.name }}">
+                  </div>
+                </div>
+                <!-- Email -->
+                <div class="info-field" id="field-email">
+                  <div class="field-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <div class="field-body">
+                    <p class="field-label">Correo electrónico</p>
+                    <p class="field-value" id="val-email">{{ user.email }}</p>
+                    <input class="field-input no-edit" id="inp-email" value="{{ user.email }}" disabled>
+                  </div>
+                </div>
+                <!-- Teléfono -->
+                <div class="info-field" id="field-tel">
+                  <div class="field-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.71 2.81a2 2 0 0 1-.45 2.11L7.91 8.81a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.71A2 2 0 0 1 22 16.92z"/></svg>
+                  </div>
+                  <div class="field-body">
+                    <p class="field-label">Teléfono</p>
+                    <p class="field-value" id="val-tel">{{ user.phone }}</p>
+                    <input class="field-input" id="inp-tel" value="{{ user.phone }}">
+                  </div>
+                </div>
+                <!-- Ubicación -->
+                <div class="info-field" id="field-loc">
+                  <div class="field-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  </div>
+                  <div class="field-body">
+                    <p class="field-label">Ubicación</p>
+                    <p class="field-value" id="val-loc">{{ user.location }}</p>
+                    <input class="field-input" id="inp-loc" value="{{ user.location }}">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones editar -->
+              <div class="edit-actions" id="edit-actions">
+                <button class="btn-cancel" onclick="cancelEdit()">Cancelar</button>
+                <button class="btn-save-info" onclick="saveInfo()">Guardar cambios</button>
+              </div>
+            </div>
+
+            <!-- Preferencias -->
+            <div class="card section-card">
+              <div class="section-header">
+                <div>
+                  <p class="section-title">Preferencias de la Aplicación</p>
+                  <p class="section-sub">Personaliza tu experiencia en RecetaFácil</p>
+                </div>
+              </div>
+              <div class="toggle-list">
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <p class="toggle-name">Modo oscuro</p>
+                    <p class="toggle-desc">Oscurece la interfaz para reducir el brillo</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-dark" onchange="onToggle(this,'Modo oscuro')">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <p class="toggle-name">Vista compacta</p>
+                    <p class="toggle-desc">Muestra más contenido en pantalla</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-compact" onchange="onToggle(this,'Vista compacta')">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="toggle-row">
+                  <div class="toggle-info">
+                    <p class="toggle-name">Tamaño de fuente</p>
+                    <p class="toggle-desc">Ajusta el tamaño del texto en la aplicación</p>
+                  </div>
+                  <div class="font-size-controls">
+                      <button class="font-size-btn" onclick="changeFontSize(-1)">−</button>
+                      <span id="font-size-label">Normal</span>
+                      <button class="font-size-btn" onclick="changeFontSize(1)">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Idioma y Región -->
+            <div class="card section-card">
+              <div class="section-header" style="margin-bottom:14px">
+                <div>
+                  <p class="section-title">Idioma y Región</p>
+                  <p class="section-sub">Configura tu idioma y zona horaria</p>
+                </div>
+                <button class="btn-edit" id="btn-lang-edit" onclick="toggleLangEdit()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Editar
+                </button>
+              </div>
+              <div class="lang-grid" id="lang-grid">
+                <div class="lang-field" id="field-idioma">
+                  <div class="lang-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  </div>
+                  <div class="lang-body">
+                    <p class="lang-label">Idioma</p>
+                    <p class="lang-value" id="val-idioma">{{ user.language if user.language else 'Español (España)' }}</p>
+                    <select class="lang-select" id="sel-idioma">
+                      <option>Español (España)</option>
+                      <option>Español (México)</option>
+                      <option>Español (Colombia)</option>
+                      <option>Español (Argentina)</option>
+                      <option>English (US)</option>
+                      <option>English (UK)</option>
+                      <option>Français</option>
+                      <option>Português (Brasil)</option>
+                      <option>Deutsch</option>
+                      <option>Italiano</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="lang-field" id="field-zona">
+                  <div class="lang-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <div class="lang-body">
+                    <p class="lang-label">Zona horaria</p>
+                    <p class="lang-value" id="val-zona">{{ user.timezone if user.timezone else 'GMT+1 (Madrid)' }}</p>
+                    <select class="lang-select" id="sel-zona">
+                      <option>GMT-8 (Los Ángeles)</option>
+                      <option>GMT-6 (Ciudad de México)</option>
+                      <option>GMT-5 (Nueva York)</option>
+                      <option>GMT-5 (Bogotá)</option>
+                      <option>GMT-4 (Santiago)</option>
+                      <option>GMT-3 (Buenos Aires)</option>
+                      <option>GMT-3 (São Paulo)</option>
+                      <option>GMT+0 (Londres)</option>
+                      <option>GMT+1 (Madrid)</option>
+                      <option>GMT+1 (París)</option>
+                      <option>GMT+2 (Helsinki)</option>
+                      <option>GMT+3 (Moscú)</option>
+                      <option>GMT+5:30 (Mumbai)</option>
+                      <option>GMT+8 (Singapur)</option>
+                      <option>GMT+9 (Tokio)</option>
+                      <option>GMT+11 (Sídney)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="edit-actions" id="lang-edit-actions">
+                <button class="btn-cancel" onclick="cancelLangEdit()">Cancelar</button>
+                <button class="btn-save-info" onclick="saveLangEdit()">Guardar cambios</button>
+              </div>
+            </div>
+
+            <!-- Guardar todo -->
+            <div class="save-row">
+              <button class="btn-save-all" onclick="saveAll()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Guardar todos los cambios
+              </button>
+            </div>
+
+          </div><!-- /right-col -->
+        </div><!-- /grid -->
+      </div><!-- /content -->
+    </div><!-- /main-scroll -->
+  </main>
+</div>
+
+<!-- ══ MODAL LOGOUT ══ -->
+<div id="modal-logout">
+  <div class="modal-box">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </div>
+    <h2>¿Cerrar sesión?</h2>
+    <p>Serás redirigido a la pantalla de inicio. Tus datos y preferencias se mantendrán guardados.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeLogoutModal()">Cancelar</button>
+      <button class="btn-modal-confirm" onclick="confirmLogout()">Sí, cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL FOTO ══ -->
+<div id="modal-photo">
+  <div class="photo-modal-box">
+    <h2>Cambiar foto de perfil</h2>
+    <p>Sube una imagen desde tu dispositivo. Se recomienda formato cuadrado.</p>
+    <img id="preview-img" src="" alt="Vista previa" />
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <span><strong>Haz clic para subir</strong> o arrastra aquí</span>
+      <span style="margin-top:4px;font-size:11px;color:#9ca3af">PNG, JPG, WEBP · Máx. 5 MB</span>
+    </div>
+    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="onFileSelect(this)" />
+    <div class="photo-actions">
+      <button class="btn-photo-cancel" onclick="closePhotoModal()">Cancelar</button>
+      <button class="btn-photo-apply" id="btn-apply-photo" onclick="applyPhoto()" disabled>Aplicar foto</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+</body>
+</html>

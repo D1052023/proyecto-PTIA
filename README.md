@@ -102,4 +102,4 @@ py -m pip install flask-bcrypt
 py -m pip install Authlib
 py -m pip install requests
 pip install secure-smtplib
-
+py -m pip install python-dotenv

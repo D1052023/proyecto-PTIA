@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, flash, url_for, session
 from flask_bcrypt import Bcrypt
 from database import users_collection
@@ -7,13 +6,24 @@ import secrets
 from datetime import datetime, timedelta
 import smtplib
 from email.mime.text import MIMEText
+import locale
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+try:
+    locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+except:
+    try:
+        locale.setlocale(locale.LC_TIME, "Spanish_Spain")
+    except:
+        locale.setlocale(locale.LC_TIME, "es_ES")
 def enviar_correo(token):
 
     try:
 
-        remitente = "paco.andres03@gmail.com"
-        contraseña = " " 
+        remitente = os.getenv("EMAIL_USER")
+        contraseña = os.getenv("EMAIL_PASS")
         destinatario = "paco.andres03@gmail.com"
 
         link = f"http://localhost:5000/reset-password/{token}"
@@ -46,16 +56,16 @@ Si no solicitaste este cambio ignora este correo.
 
 app = Flask(__name__)
 
-app.secret_key = "super_secret_key"
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 bcrypt = Bcrypt(app)
 oauth = OAuth(app)
 
 google = oauth.register(
     name="google",
-    client_id="  ",
-    client_secret=" ",
-    server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration",
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={
         "scope": "openid email profile"
     }
@@ -103,7 +113,8 @@ def register_google_callback():
     users_collection.insert_one({
         "email": email,
         "name": name,
-        "google": True
+        "google": True,
+        "created_at": datetime.utcnow()
     })
 
     session["user"] = email
@@ -143,33 +154,34 @@ def register():
         password = request.form["password"]
         confirm_password = request.form["confirm_password"]
         terms = request.form.get("terms")
+
         if not terms:
             flash("Debes aceptar los términos y condiciones")
             return redirect("/register")
+
         if password != confirm_password:
             flash("Las contraseñas no coinciden")
             return redirect("/register")
+
         existing_user = users_collection.find_one({"email": email})
         if existing_user:
             flash("El usuario ya existe")
             return redirect("/register")
+
         hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
         # guardar usuario
         users_collection.insert_one({
             "name": name,
             "email": email,
-            "password": hashed_password
+            "password": hashed_password,
+            "created_at": datetime.utcnow()   # ← AQUI
         })
 
         flash("Usuario creado correctamente")
         return redirect("/")
 
     return render_template("register.html")
-
-@app.route("/dashboard")
-def dashboard():
-    return render_template("dashboard.html")
 
 @app.route("/forgotPassword", methods=["GET","POST"])
 def forgot_password():
@@ -248,6 +260,80 @@ def reset_password_token(token):
 
     return render_template("newPassword.html")
 
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
 
+@app.route("/profile")
+def profile():
+    if "user" not in session:
+        return redirect("/")
+
+    email = session["user"]
+    user = users_collection.find_one({"email": email})
+
+    # FECHA DE REGISTRO
+    created = user.get("created_at")
+    if created:
+        fecha_registro = created.strftime("%B %Y")  # "marzo 2024"
+    else:
+        fecha_registro = "Fecha no disponible"
+
+    # Enviar datos
+    user_data = {
+        "name": user.get("name", ""),
+        "email": user.get("email", ""),
+        "phone": user.get("phone", ""),
+        "location": user.get("location", ""),
+        "photo": user.get("photo", ""),
+        "fecha_registro": fecha_registro,
+        "language": user.get("language", "es"),
+        "timezone": user.get("timezone", "America/Bogota")
+        
+    }
+
+    return render_template("profile.html", user=user_data)
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+    session.clear()
+    return redirect("/")
+
+@app.route("/profile/update", methods=["POST"])
+def update_profile():
+    if "user" not in session:
+        return {"success": False, "message": "No autorizado"}, 401
+
+    email = session["user"]
+    data = request.get_json()
+
+    update_fields = {}
+
+    # SOLO actualizar lo que llegue
+    if "name" in data:
+        update_fields["name"] = data["name"]
+
+    if "phone" in data:
+        update_fields["phone"] = data["phone"]
+
+    if "location" in data:
+        update_fields["location"] = data["location"]
+
+    if "language" in data:
+        update_fields["language"] = data["language"]
+
+    if "timezone" in data:
+        update_fields["timezone"] = data["timezone"]
+
+    # 🔥 FOTO (CLAVE)
+    if "photo" in data:
+        update_fields["photo"] = data["photo"]
+
+    users_collection.update_one(
+        {"email": email},
+        {"$set": update_fields}
+    )
+
+    return {"success": True}
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
