@@ -225,20 +225,6 @@ input:checked + .toggle-track::before { transform: translateX(20px); }
 .lang-field.editing .lang-value { display: none; }
 .lang-field.editing .lang-select { display: block; }
 
-/* ── Save button ── */
-.save-row { display: flex; justify-content: flex-end; }
-.btn-save-all {
-  height: 44px; padding: 0 28px;
-  background: #4caf50; border: none; border-radius: 11px;
-  color: #fff; font-size: 14px; font-weight: 700; font-family: Inter, sans-serif;
-  cursor: pointer; display: flex; align-items: center; gap: 8px;
-  box-shadow: 0 4px 14px rgba(76,175,80,0.3);
-  transition: background .18s, transform .1s, box-shadow .18s;
-}
-.btn-save-all:hover { background: #43a047; box-shadow: 0 6px 18px rgba(76,175,80,0.35); }
-.btn-save-all:active { transform: scale(.98); }
-.btn-save-all svg { width: 16px; height: 16px; }
-
 /* ══ MODAL LOGOUT ══ */
 #modal-logout {
   display: none; position: fixed; inset: 0;

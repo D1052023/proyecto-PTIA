@@ -1,9 +1,17 @@
 const TIPS = [
-  { emoji: '🍅', name: 'Pasta al pomodoro', tags: ['Tomate', 'Ajo', 'Albahaca'], time: '20 min' },
-  { emoji: '🥚', name: 'Tortilla española', tags: ['Huevo', 'Papa', 'Cebolla'], time: '25 min' },
-  { emoji: '🍗', name: 'Pollo al limón', tags: ['Pollo', 'Limón', 'Ajo'], time: '35 min' },
-  { emoji: '🥑', name: 'Bowl de aguacate', tags: ['Aguacate', 'Arroz', 'Limón'], time: '15 min' },
+  { emoji: '🍅', name: 'Pasta al pomodoro',  tags: ['Tomate', 'Ajo', 'Albahaca'], time: '20 min', kcal: '320 kcal', badge: 'ITALIANA',   match: 2 },
+  { emoji: '🥚', name: 'Tortilla española',  tags: ['Huevo', 'Papa', 'Cebolla'],  time: '25 min', kcal: '350 kcal', badge: 'SALUDABLE',  match: 3 },
+  { emoji: '🍗', name: 'Pollo al limón',     tags: ['Pollo', 'Limón', 'Ajo'],     time: '35 min', kcal: '410 kcal', badge: 'TRADICIONAL', match: 2 },
+  { emoji: '🥑', name: 'Bowl de aguacate',   tags: ['Aguacate', 'Arroz', 'Limón'],time: '15 min', kcal: '280 kcal', badge: 'VEGANO',      match: 1 },
 ];
+
+const BADGE_COLORS = {
+  SALUDABLE:   '#4caf50',
+  TRADICIONAL: '#ff9800',
+  VEGANO:      '#8bc34a',
+  ITALIANA:    '#e91e63',
+  RAPIDA:      '#2196f3',
+};
 
 const ingrs = [];
 let inp, chips, list, ctr, btn, toast, tipsGrid;
@@ -17,15 +25,45 @@ document.addEventListener('DOMContentLoaded', () => {
   toast    = document.getElementById('toast');
   tipsGrid = document.getElementById('tips-grid');
 
-  /* Renderizar tips */
+  /* Renderizar tips como recipe cards */
   TIPS.forEach(t => {
-    tipsGrid.innerHTML += `
-      <div class="tip-card" onclick="addTip(${JSON.stringify(t.tags).replace(/"/g, "'")})">
+    const total = t.tags.length;
+    const filled = t.match;
+    const empty  = total - filled;
+    const color  = BADGE_COLORS[t.badge] || '#4caf50';
+
+    const dots = [
+      ...Array(filled).fill('<span class="tip-dot tip-dot--filled"></span>'),
+      ...Array(empty).fill('<span class="tip-dot tip-dot--empty"></span>'),
+    ].join('');
+
+    const tagsHTML = t.tags
+      .map(tag => `<span class="tip-tag">${tag.toLowerCase()}</span>`)
+      .join('');
+
+    const card = document.createElement('div');
+    card.className = 'tip-card';
+    card.innerHTML = `
+      <div class="tip-image">
         <span class="tip-emoji">${t.emoji}</span>
+        <span class="tip-badge" style="background:${color}">${t.badge}</span>
+      </div>
+      <div class="tip-body">
         <p class="tip-name">${t.name}</p>
-        <p class="tip-desc">${t.tags.join(' · ')}</p>
-        <span class="tip-tag">⏱ ${t.time}</span>
+        <div class="tip-meta">
+          <span class="tip-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${t.time}
+          </span>
+          <span class="tip-meta-item">
+            🔥 ${t.kcal}
+          </span>
+        </div>
+        <div class="tip-tags">${tagsHTML}</div>
       </div>`;
+
+    card.addEventListener('click', () => addTip(t.tags));
+    tipsGrid.appendChild(card);
   });
 
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });

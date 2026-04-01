@@ -335,5 +335,9 @@ def update_profile():
     )
 
     return {"success": True}
+
+@app.route("/recipe")
+def recipe():
+    return render_template("recipe.html")
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
