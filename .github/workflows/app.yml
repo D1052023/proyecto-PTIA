@@ -1,0 +1,42 @@
+name: Flask CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+    steps:
+      - name: Clonar repo
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask flask-bcrypt authlib pymongo python-dotenv
+
+      - name: Verificar variables de entorno
+        run: |
+          echo "SECRET KEY: $FLASK_SECRET_KEY"
+          echo "EMAIL: $EMAIL_USER"
+
+      - name: Ejecutar app (test básico)
+        run: |
+          python app.py & sleep 5
+          echo "App iniciada correctamente"
