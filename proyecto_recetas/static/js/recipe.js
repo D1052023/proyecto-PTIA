@@ -12,7 +12,9 @@ const ALL_RECIPES = [
 ];
 
 let visibleCount = 6;
-let favorites = new Set();
+let saved = [];
+try { saved = JSON.parse(localStorage.getItem('rf_favorites')) || []; } catch(e) {}
+let favorites = new Set(saved.map(r => r.id));
 let activeFilter = 'todas';
 let searchQ = '';
 let sortBy = 'match';
@@ -90,13 +92,34 @@ function renderGrid() {
 
 function toggleFav(e, id) {
   e.stopPropagation();
-  if (favorites.has(id)) {
-    favorites.delete(id);
+  
+  // Leer favoritos actuales del localStorage
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem('rf_favorites')) || []; } catch(e) {}
+
+  const recipe = ALL_RECIPES.find(r => r.id === id);
+  const exists = saved.some(r => r.id === id);
+
+  if (exists) {
+    saved = saved.filter(r => r.id !== id);
     showToast('Eliminado de favoritos');
   } else {
-    favorites.add(id);
+    saved.push({
+      id:         recipe.id,
+      emoji:      recipe.emoji,
+      name:       recipe.name,
+      badge:      recipe.badge,
+      time:       recipe.time,
+      kcal:       recipe.kcal,
+      savedAt:    Date.now(),
+      collection: 'Sin colección',
+    });
     showToast('✓ Guardado en favoritos');
   }
+
+  // Persistir
+  localStorage.setItem('rf_favorites', JSON.stringify(saved));
+  favorites = new Set(saved.map(r => r.id)); // actualizar el Set local
   renderGrid();
 }
 

@@ -131,6 +131,7 @@ pip install flask flask-sqlalchemy werkzeug
 ### 1️⃣ Entrenar el modelo
 
 ```bash
+py -m pip install tensorflow pillow numpy scikit-learn
 py train_model.py
 ```
 
@@ -156,6 +157,7 @@ http://127.0.0.1:5000
 pip install pymongo flask-bcrypt python-dotenv
 python -m pip install "pymongo[srv]"
 pip install authlib requests secure-smtplib
+py -m pip install anthropic
 ```
 
 ### 🔐 Dependencias adicionales (autenticación y seguridad)
@@ -201,3 +203,4 @@ Este proyecto está bajo la licencia especificada en el archivo `LICENSE`.
 ---
 
 ✨ *Proyecto académico enfocado en la aplicación de Inteligencia Artificial en la vida cotidiana.*
+

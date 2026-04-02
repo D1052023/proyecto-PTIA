@@ -1,8 +1,8 @@
 const TIPS = [
-  { emoji: '🍅', name: 'Pasta al pomodoro',  tags: ['Tomate', 'Ajo', 'Albahaca'], time: '20 min', kcal: '320 kcal', badge: 'ITALIANA',   match: 2 },
-  { emoji: '🥚', name: 'Tortilla española',  tags: ['Huevo', 'Papa', 'Cebolla'],  time: '25 min', kcal: '350 kcal', badge: 'SALUDABLE',  match: 3 },
+  { emoji: '🍅', name: 'Pasta al pomodoro',  tags: ['Tomate', 'Ajo', 'Albahaca'], time: '20 min', kcal: '320 kcal', badge: 'ITALIANA',    match: 2 },
+  { emoji: '🥚', name: 'Tortilla española',  tags: ['Huevo', 'Papa', 'Cebolla'],  time: '25 min', kcal: '350 kcal', badge: 'SALUDABLE',   match: 3 },
   { emoji: '🍗', name: 'Pollo al limón',     tags: ['Pollo', 'Limón', 'Ajo'],     time: '35 min', kcal: '410 kcal', badge: 'TRADICIONAL', match: 2 },
-  { emoji: '🥑', name: 'Bowl de aguacate',   tags: ['Aguacate', 'Arroz', 'Limón'],time: '15 min', kcal: '280 kcal', badge: 'VEGANO',      match: 1 },
+  { emoji: '🥑', name: 'Bowl de aguacate',   tags: ['Aguacate', 'Arroz', 'Limón'],time: '15 min', kcal: '280 kcal', badge: 'VEGANO',       match: 1 },
 ];
 
 const BADGE_COLORS = {
@@ -13,9 +13,16 @@ const BADGE_COLORS = {
   RAPIDA:      '#2196f3',
 };
 
+// ── Estado global ─────────────────────────────────────────
 const ingrs = [];
 let inp, chips, list, ctr, btn, toast, tipsGrid;
 
+// ── Estado del modal de cámara ────────────────────────────
+let currentFile         = null;
+let detectedIngredients = [];
+let selectedDetected    = new Set();
+
+// ── DOMContentLoaded ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   inp      = document.getElementById('ing-input');
   chips    = document.getElementById('chips');
@@ -25,18 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
   toast    = document.getElementById('toast');
   tipsGrid = document.getElementById('tips-grid');
 
-  /* Renderizar tips como recipe cards */
+  // Renderizar tips como recipe cards
   TIPS.forEach(t => {
-    const total = t.tags.length;
-    const filled = t.match;
-    const empty  = total - filled;
-    const color  = BADGE_COLORS[t.badge] || '#4caf50';
-
-    const dots = [
-      ...Array(filled).fill('<span class="tip-dot tip-dot--filled"></span>'),
-      ...Array(empty).fill('<span class="tip-dot tip-dot--empty"></span>'),
-    ].join('');
-
+    const color    = BADGE_COLORS[t.badge] || '#4caf50';
     const tagsHTML = t.tags
       .map(tag => `<span class="tip-tag">${tag.toLowerCase()}</span>`)
       .join('');
@@ -52,12 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <p class="tip-name">${t.name}</p>
         <div class="tip-meta">
           <span class="tip-meta-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
             ${t.time}
           </span>
-          <span class="tip-meta-item">
-            🔥 ${t.kcal}
-          </span>
+          <span class="tip-meta-item">🔥 ${t.kcal}</span>
         </div>
         <div class="tip-tags">${tagsHTML}</div>
       </div>`;
@@ -66,8 +65,21 @@ document.addEventListener('DOMContentLoaded', () => {
     tipsGrid.appendChild(card);
   });
 
+  // Teclado en input de ingredientes
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+
+  // Botón "Abrir cámara" → abre el modal
+  document.querySelector('.btn-cam').addEventListener('click', openCamModal);
+
+  // Cerrar modal al hacer clic en el backdrop
+  document.getElementById('cam-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCamModal();
+  });
 });
+
+// ════════════════════════════════════════════════════════════
+// LÓGICA DE INGREDIENTES (dashboard)
+// ════════════════════════════════════════════════════════════
 
 function addTip(tags) {
   tags.forEach(tag => {
@@ -124,7 +136,8 @@ function del(k) {
     list.innerHTML = `
       <div id="empty">
         <div class="empty-icon-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+               stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21h6"/>
           </svg>
         </div>
@@ -144,4 +157,217 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+// ════════════════════════════════════════════════════════════
+// MODAL DE CÁMARA / SUBIDA DE IMAGEN
+// ════════════════════════════════════════════════════════════
+
+function openCamModal() {
+  resetCamModal();
+  document.getElementById('cam-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCamModal() {
+  document.getElementById('cam-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function resetCamModal() {
+  currentFile         = null;
+  detectedIngredients = [];
+  selectedDetected.clear();
+
+  showDzState('idle');
+  document.getElementById('detection-result').style.display = 'none';
+  document.getElementById('detection-error').style.display  = 'none';
+  document.getElementById('detected-chips').innerHTML       = '';
+  document.getElementById('file-input').value               = '';
+
+  // Eliminar botón dinámico si existía de una sesión anterior
+  const old = document.getElementById('btn-add-detected');
+  if (old) old.remove();
+
+  const btnDetect = document.getElementById('btn-detect');
+  btnDetect.disabled = true;
+  setDetectBtnLoading(false);
+}
+
+// ── Drag & drop ───────────────────────────────────────────
+function dragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.add('drag-over');
+}
+function dragLeave(e) {
+  document.getElementById('dropzone').classList.remove('drag-over');
+}
+function dropFile(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadFile(file);
+}
+
+// ── Selección por input file ──────────────────────────────
+function fileSelected(e) {
+  const file = e.target.files[0];
+  if (file) loadFile(file);
+}
+
+function changeImage(e) {
+  e.stopPropagation();
+  document.getElementById('file-input').click();
+}
+
+// ── Cargar imagen y mostrar preview ──────────────────────
+function loadFile(file) {
+  currentFile = file;
+
+  document.getElementById('detection-result').style.display = 'none';
+  document.getElementById('detection-error').style.display  = 'none';
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.getElementById('preview-img').src = ev.target.result;
+    showDzState('preview');
+    document.getElementById('btn-detect').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showDzState(state) {
+  document.getElementById('dz-idle').style.display    = state === 'idle'    ? 'flex' : 'none';
+  document.getElementById('dz-preview').style.display = state === 'preview' ? 'flex' : 'none';
+}
+
+// ── Estado de carga del botón Detectar ───────────────────
+function setDetectBtnLoading(loading) {
+  const btnDetect = document.getElementById('btn-detect');
+  const label     = document.getElementById('btn-detect-label');
+  const spinner   = document.getElementById('btn-detect-spinner');
+  btnDetect.disabled    = loading;
+  label.style.display   = loading ? 'none'         : 'inline';
+  spinner.style.display = loading ? 'inline-block' : 'none';
+}
+
+// ── Llamada al backend Flask ──────────────────────────────
+async function detectIngredients() {
+  if (!currentFile) return;
+
+  document.getElementById('detection-result').style.display = 'none';
+  document.getElementById('detection-error').style.display  = 'none';
+  setDetectBtnLoading(true);
+
+  try {
+    const formData = new FormData();
+    formData.append('file', currentFile);
+
+    const response = await fetch('/detect-ingredients', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Error del servidor: ${response.status}`);
+    }
+
+    const data = await response.json();
+    detectedIngredients = data.ingredientes || [];
+
+    if (detectedIngredients.length === 0) {
+      showDetectionError('No se detectaron ingredientes en la imagen. Intenta con una foto más clara.');
+      return;
+    }
+
+    renderDetectedChips(detectedIngredients);
+    document.getElementById('detection-result').style.display = 'block';
+
+  } catch (err) {
+    console.error('Error detectando ingredientes:', err);
+    showDetectionError(err.message || 'No se pudo analizar la imagen. Inténtalo de nuevo.');
+  } finally {
+    setDetectBtnLoading(false);
+  }
+}
+
+// ── Renderizar chips seleccionables ───────────────────────
+function renderDetectedChips(items) {
+  selectedDetected.clear();
+  items.forEach(i => selectedDetected.add(i));
+
+  const container = document.getElementById('detected-chips');
+  container.innerHTML = '';
+
+  updateAddButton();
+
+  items.forEach(name => {
+    const chip = document.createElement('div');
+    chip.className = 'detected-chip selected';
+    chip.dataset.name = name;
+    chip.textContent = name;
+    chip.addEventListener('click', () => toggleDetectedChip(chip, name));
+    container.appendChild(chip);
+  });
+}
+
+function toggleDetectedChip(chip, name) {
+  if (selectedDetected.has(name)) {
+    selectedDetected.delete(name);
+    chip.classList.remove('selected');
+  } else {
+    selectedDetected.add(name);
+    chip.classList.add('selected');
+  }
+  updateAddButton();
+}
+
+// ── Botón dinámico "Agregar seleccionados" ────────────────
+function updateAddButton() {
+  let addBtn = document.getElementById('btn-add-detected');
+  if (!addBtn) {
+    addBtn = document.createElement('button');
+    addBtn.id            = 'btn-add-detected';
+    addBtn.className     = 'btn-detect';
+    addBtn.style.cssText = 'width:100%; margin-top:4px;';
+    addBtn.onclick       = addDetectedToList;
+    document.querySelector('.cam-modal-footer').prepend(addBtn);
+  }
+  const n = selectedDetected.size;
+  addBtn.textContent = n > 0
+    ? `Agregar ${n} ingrediente${n === 1 ? '' : 's'}`
+    : 'Selecciona al menos uno';
+  addBtn.disabled = n === 0;
+}
+
+// ── Agregar seleccionados al dashboard ────────────────────
+function addDetectedToList() {
+  const names = [...selectedDetected];
+  const added = [];
+
+  names.forEach(name => {
+    if (!ingrs.includes(name)) {
+      ingrs.push(name);
+      addChip(name);
+      addItem(name);
+      added.push(name);
+    }
+  });
+
+  sync();
+
+  if (added.length) {
+    showToast(`✓ ${added.length} ingrediente${added.length === 1 ? '' : 's'} agregado${added.length === 1 ? '' : 's'}`);
+  } else {
+    showToast('Esos ingredientes ya estaban en tu lista');
+  }
+
+  closeCamModal();
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function showDetectionError(msg) {
+  document.getElementById('error-msg').textContent = msg;
+  document.getElementById('detection-error').style.display = 'flex';
 }

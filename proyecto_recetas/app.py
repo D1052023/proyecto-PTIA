@@ -9,6 +9,8 @@ from email.mime.text import MIMEText
 import locale
 from dotenv import load_dotenv
 import os
+import anthropic, base64
+#from models.modelo_mobilenet import predecir_plato
 
 load_dotenv()
 try:
@@ -339,5 +341,36 @@ def update_profile():
 @app.route("/recipe")
 def recipe():
     return render_template("recipe.html")
+
+@app.route('/favorites')
+def favorites():
+    return render_template('favorites.html')
+
+##@app.route("/predict", methods=["POST"])
+##def predict():
+    file = request.files["file"]
+    path = "static/uploads/" + file.filename
+    file.save(path)
+
+    prediction = predecir_plato(path)
+    return render_template("resultados.html", plato=prediction)
+@app.route('/detect-ingredients', methods=['POST'])
+def detect_ingredients():
+    file = request.files['file']
+    img_b64 = base64.b64encode(file.read()).decode('utf-8')
+    
+    client = anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY'))
+    message = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=1024,
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image", "source": {"type": "base64", "media_type": file.mimetype, "data": img_b64}},
+                {"type": "text", "text": 'Devuelve SOLO un JSON: {"ingredientes": ["..."]}'}
+            ]
+        }]
+    )
+    return message.content[0].text
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
