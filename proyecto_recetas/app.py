@@ -382,7 +382,7 @@ def recomendar():
 
             # 🔥 2. Detectar plato con IA
             plato = predecir_plato(ruta)
-            plato = plato.lower().strip()  # 🔥 MUY IMPORTANTE
+            plato = plato.lower().strip()
 
             # 🔥 3. Cargar ingredientes por plato
             mapa_path = os.path.join(BASE_DIR, "data", "map_plato_ingredientes.json")
@@ -407,10 +407,9 @@ def recomendar():
             else:
                 calorias_data = {}
 
-            # 🔥 7. Obtener calorías del plato (NO ingredientes)
             total_calorias = calorias_data.get(plato, "No disponible")
 
-            # 🔥 8. Clasificación nutricional
+            # 🔥 7. Clasificación nutricional
             if isinstance(total_calorias, int):
                 if total_calorias < 200:
                     nivel = "🟢 Bajo en calorías"
@@ -421,6 +420,30 @@ def recomendar():
             else:
                 nivel = "No disponible"
 
+            # 🔥 8. Cargar categorías
+            categorias_path = os.path.join(BASE_DIR, "data", "categorias_platos.json")
+
+            if os.path.exists(categorias_path):
+                with open(categorias_path, "r", encoding="utf-8") as f:
+                    categorias_data = json.load(f)
+            else:
+                categorias_data = {}
+
+            categorias = categorias_data.get(plato, ["Sin categoría"])
+
+            # 🔥 9. Cargar RECETAS 🔥 (NUEVO)
+            recetas_path = os.path.join(BASE_DIR, "data", "recetas_platos.json")
+
+            if os.path.exists(recetas_path):
+                with open(recetas_path, "r", encoding="utf-8") as f:
+                    recetas_data = json.load(f)
+            else:
+                recetas_data = {}
+
+            receta = recetas_data.get(plato, {"pasos": ["Receta no disponible"]})
+            pasos = receta.get("pasos", ["Receta no disponible"])
+
+            # 🔥 10. Render FINAL
             return render_template(
                 "resultados.html",
                 plato_detectado=plato,
@@ -428,9 +451,56 @@ def recomendar():
                 recomendaciones=recomendaciones,
                 total_calorias=total_calorias,
                 nivel=nivel,
+                categorias=categorias,
+                pasos=pasos,  # 👈 NUEVO
                 imagen=filename
             )
 
     return render_template("recomendar.html")
+# ── Agregar esta ruta a tu app.py ────────────────────────
+# Va junto al resto de tus rutas, después de /detect-ingredients
+
+@app.route('/detect-dish', methods=['POST'])
+def detect_dish():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No se envió ningún archivo'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Archivo vacío'}), 400
+
+    try:
+        # Guardar imagen temporalmente
+        upload_folder = os.path.join(BASE_DIR, 'static', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+
+        filename = secure_filename(file.filename)
+        ruta     = os.path.join(upload_folder, filename)
+        file.save(ruta)
+
+        # Detectar platillo con tu modelo Food-101
+        plato = predecir_plato(ruta)
+        plato = plato.lower().strip()
+
+        # Cargar mapa platillo → ingredientes
+        mapa_path = os.path.join(BASE_DIR, 'data', 'map_plato_ingredientes.json')
+        with open(mapa_path, 'r', encoding='utf-8') as f:
+            mapa = json.load(f)
+
+        ingredientes = mapa.get(plato, [])
+
+        if not ingredientes:
+            return jsonify({
+                'error': f'Platillo "{plato}" detectado pero sin ingredientes registrados'
+            }), 404
+
+        return jsonify({
+            'plato': plato,
+            'ingredientes': ingredientes
+        })
+
+    except Exception as e:
+        print(f'Error en detect_dish: {e}')
+        return jsonify({'error': str(e)}), 500
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

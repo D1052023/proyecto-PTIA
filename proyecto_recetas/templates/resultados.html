@@ -25,5 +25,17 @@
                 No hay datos de calorías
             {% endif %}
         </p>
+    <h2>🏷 Categorías:</h2>
+    <ul>
+        {% for c in categorias %}
+            <li>{{ c }}</li>
+        {% endfor %}
+    </ul>
+    <h2>👨‍🍳 Receta:</h2>
+    <ol>
+        {% for paso in pasos %}
+            <li>{{ paso }}</li>
+        {% endfor %}
+    </ol>
 </body>
 </html>

@@ -17,10 +17,22 @@ const BADGE_COLORS = {
 const ingrs = [];
 let inp, chips, list, ctr, btn, toast, tipsGrid;
 
-// ── Estado del modal de cámara ────────────────────────────
+// ── Estado del modal ──────────────────────────────────────
 let currentFile         = null;
 let detectedIngredients = [];
 let selectedDetected    = new Set();
+let activeTab           = 'ingredients'; // 'ingredients' | 'dish'
+
+const TAB_TEXTS = {
+  ingredients: {
+    desc: 'Sube una foto de tu nevera o ingredientes sueltos para detectarlos automáticamente',
+    btn:  'Detectar ingredientes',
+  },
+  dish: {
+    desc: 'Sube una foto de un platillo preparado y extraeremos sus ingredientes automáticamente',
+    btn:  'Detectar platillo',
+  }
+};
 
 // ── DOMContentLoaded ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
   toast    = document.getElementById('toast');
   tipsGrid = document.getElementById('tips-grid');
 
-  // Renderizar tips como recipe cards
   TIPS.forEach(t => {
     const color    = BADGE_COLORS[t.badge] || '#4caf50';
     const tagsHTML = t.tags
@@ -65,13 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
     tipsGrid.appendChild(card);
   });
 
-  // Teclado en input de ingredientes
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
 
-  // Botón "Abrir cámara" → abre el modal
   document.querySelector('.btn-cam').addEventListener('click', openCamModal);
 
-  // Cerrar modal al hacer clic en el backdrop
   document.getElementById('cam-modal').addEventListener('click', function(e) {
     if (e.target === this) closeCamModal();
   });
@@ -160,7 +168,30 @@ function showToast(msg) {
 }
 
 // ════════════════════════════════════════════════════════════
-// MODAL DE CÁMARA / SUBIDA DE IMAGEN
+// MODAL — TABS
+// ════════════════════════════════════════════════════════════
+
+function switchTab(tab) {
+  activeTab = tab;
+
+  document.getElementById('tab-ingredients').classList.toggle('active', tab === 'ingredients');
+  document.getElementById('tab-dish').classList.toggle('active', tab === 'dish');
+
+  document.getElementById('tab-desc').textContent        = TAB_TEXTS[tab].desc;
+  document.getElementById('btn-detect-label').textContent = TAB_TEXTS[tab].btn;
+
+  // Limpiar resultados al cambiar tab
+  document.getElementById('detection-result').style.display = 'none';
+  document.getElementById('detection-error').style.display  = 'none';
+  document.getElementById('dish-result').style.display      = 'none';
+  document.getElementById('detected-chips').innerHTML       = '';
+
+  const old = document.getElementById('btn-add-detected');
+  if (old) old.remove();
+}
+
+// ════════════════════════════════════════════════════════════
+// MODAL — ABRIR / CERRAR / RESET
 // ════════════════════════════════════════════════════════════
 
 function openCamModal() {
@@ -178,23 +209,32 @@ function resetCamModal() {
   currentFile         = null;
   detectedIngredients = [];
   selectedDetected.clear();
+  activeTab           = 'ingredients';
+
+  // Resetear tabs visualmente
+  document.getElementById('tab-ingredients').classList.add('active');
+  document.getElementById('tab-dish').classList.remove('active');
+  document.getElementById('tab-desc').textContent         = TAB_TEXTS.ingredients.desc;
+  document.getElementById('btn-detect-label').textContent = TAB_TEXTS.ingredients.btn;
 
   showDzState('idle');
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
+  document.getElementById('dish-result').style.display      = 'none';
   document.getElementById('detected-chips').innerHTML       = '';
   document.getElementById('file-input').value               = '';
 
-  // Eliminar botón dinámico si existía de una sesión anterior
   const old = document.getElementById('btn-add-detected');
   if (old) old.remove();
 
-  const btnDetect = document.getElementById('btn-detect');
-  btnDetect.disabled = true;
+  document.getElementById('btn-detect').disabled = true;
   setDetectBtnLoading(false);
 }
 
-// ── Drag & drop ───────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+// MODAL — DROPZONE / ARCHIVO
+// ════════════════════════════════════════════════════════════
+
 function dragOver(e) {
   e.preventDefault();
   document.getElementById('dropzone').classList.add('drag-over');
@@ -209,7 +249,6 @@ function dropFile(e) {
   if (file && file.type.startsWith('image/')) loadFile(file);
 }
 
-// ── Selección por input file ──────────────────────────────
 function fileSelected(e) {
   const file = e.target.files[0];
   if (file) loadFile(file);
@@ -220,12 +259,12 @@ function changeImage(e) {
   document.getElementById('file-input').click();
 }
 
-// ── Cargar imagen y mostrar preview ──────────────────────
 function loadFile(file) {
   currentFile = file;
 
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
+  document.getElementById('dish-result').style.display      = 'none';
 
   const reader = new FileReader();
   reader.onload = (ev) => {
@@ -241,7 +280,6 @@ function showDzState(state) {
   document.getElementById('dz-preview').style.display = state === 'preview' ? 'flex' : 'none';
 }
 
-// ── Estado de carga del botón Detectar ───────────────────
 function setDetectBtnLoading(loading) {
   const btnDetect = document.getElementById('btn-detect');
   const label     = document.getElementById('btn-detect-label');
@@ -251,7 +289,19 @@ function setDetectBtnLoading(loading) {
   spinner.style.display = loading ? 'inline-block' : 'none';
 }
 
-// ── Llamada al backend Flask ──────────────────────────────
+// ════════════════════════════════════════════════════════════
+// DETECCIÓN — dispatcher según tab activo
+// ════════════════════════════════════════════════════════════
+
+function detectAuto() {
+  if (activeTab === 'ingredients') {
+    detectIngredients();
+  } else {
+    detectDish();
+  }
+}
+
+// ── Tab: Ingredientes sueltos → Gemini ────────────────────
 async function detectIngredients() {
   if (!currentFile) return;
 
@@ -277,7 +327,7 @@ async function detectIngredients() {
     detectedIngredients = data.ingredientes || [];
 
     if (detectedIngredients.length === 0) {
-      showDetectionError('No se detectaron ingredientes en la imagen. Intenta con una foto más clara.');
+      showDetectionError('No se detectaron ingredientes. Intenta con una foto más clara.');
       return;
     }
 
@@ -292,7 +342,57 @@ async function detectIngredients() {
   }
 }
 
-// ── Renderizar chips seleccionables ───────────────────────
+// ── Tab: Platillo → Food-101 ──────────────────────────────
+async function detectDish() {
+  if (!currentFile) return;
+
+  document.getElementById('detection-result').style.display = 'none';
+  document.getElementById('detection-error').style.display  = 'none';
+  document.getElementById('dish-result').style.display      = 'none';
+  setDetectBtnLoading(true);
+
+  try {
+    const formData = new FormData();
+    formData.append('file', currentFile);
+
+    const response = await fetch('/detect-dish', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Error del servidor: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Mostrar nombre del platillo
+    document.getElementById('dish-name').textContent    = data.plato || '';
+    document.getElementById('dish-result').style.display = 'block';
+
+    detectedIngredients = data.ingredientes || [];
+
+    if (detectedIngredients.length === 0) {
+      showDetectionError('Platillo detectado pero sin ingredientes registrados.');
+      return;
+    }
+
+    renderDetectedChips(detectedIngredients);
+    document.getElementById('detection-result').style.display = 'block';
+
+  } catch (err) {
+    console.error('Error detectando platillo:', err);
+    showDetectionError(err.message || 'No se pudo reconocer el platillo. Inténtalo de nuevo.');
+  } finally {
+    setDetectBtnLoading(false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// CHIPS SELECCIONABLES
+// ════════════════════════════════════════════════════════════
+
 function renderDetectedChips(items) {
   selectedDetected.clear();
   items.forEach(i => selectedDetected.add(i));
@@ -323,7 +423,6 @@ function toggleDetectedChip(chip, name) {
   updateAddButton();
 }
 
-// ── Botón dinámico "Agregar seleccionados" ────────────────
 function updateAddButton() {
   let addBtn = document.getElementById('btn-add-detected');
   if (!addBtn) {
@@ -341,7 +440,6 @@ function updateAddButton() {
   addBtn.disabled = n === 0;
 }
 
-// ── Agregar seleccionados al dashboard ────────────────────
 function addDetectedToList() {
   const names = [...selectedDetected];
   const added = [];
