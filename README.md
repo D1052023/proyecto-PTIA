@@ -158,6 +158,10 @@ pip install pymongo flask-bcrypt python-dotenv
 python -m pip install "pymongo[srv]"
 pip install authlib requests secure-smtplib
 py -m pip install anthropic
+py -m pip install google-generativeai
+py -m pip install sentence-transformers
+py -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+py -m pip install tensorflow  
 ```
 
 ### 🔐 Dependencias adicionales (autenticación y seguridad)
@@ -204,3 +208,19 @@ Este proyecto está bajo la licencia especificada en el archivo `LICENSE`.
 
 ✨ *Proyecto académico enfocado en la aplicación de Inteligencia Artificial en la vida cotidiana.*
 
+1. Crear entorno con Python 3.10
+
+En tu carpeta del proyecto:
+
+py -3.10 -m venv tf_env
+2. Activar entorno
+tf_env\Scripts\activate
+
+🚀 Sigue estos pasos para instalar TensorFlow y tensorflow-io sin problemas:
+Actualiza pip:
+
+pip install --upgrade pip
+Instala TensorFlow:
+pip install tensorflow
+Instala tensorflow-io:
+pip install tensorflow-io

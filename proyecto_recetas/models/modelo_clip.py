@@ -2,7 +2,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import img_to_array, load_img
+from keras.preprocessing.image import img_to_array, load_img
 import numpy as np
 
 # Ruta segura del modelo
