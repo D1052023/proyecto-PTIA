@@ -431,7 +431,7 @@ def recomendar():
 
             categorias = categorias_data.get(plato, ["Sin categoría"])
 
-            # 🔥 9. Cargar RECETAS 🔥 (NUEVO)
+            # 🔥 9. Cargar recetas
             recetas_path = os.path.join(BASE_DIR, "data", "recetas_platos.json")
 
             if os.path.exists(recetas_path):
@@ -443,7 +443,18 @@ def recomendar():
             receta = recetas_data.get(plato, {"pasos": ["Receta no disponible"]})
             pasos = receta.get("pasos", ["Receta no disponible"])
 
-            # 🔥 10. Render FINAL
+            # 🔥 10. Cargar TIEMPO DE PREPARACIÓN ⏱
+            tiempos_path = os.path.join(BASE_DIR, "data", "tiempos_preparacion.json")
+
+            if os.path.exists(tiempos_path):
+                with open(tiempos_path, "r", encoding="utf-8") as f:
+                    tiempos_data = json.load(f)
+            else:
+                tiempos_data = {}
+
+            tiempo_preparacion = tiempos_data.get(plato, "No disponible")
+
+            # 🔥 11. Render FINAL
             return render_template(
                 "resultados.html",
                 plato_detectado=plato,
@@ -452,7 +463,8 @@ def recomendar():
                 total_calorias=total_calorias,
                 nivel=nivel,
                 categorias=categorias,
-                pasos=pasos,  # 👈 NUEVO
+                pasos=pasos,
+                tiempo_preparacion=tiempo_preparacion,  # 👈 NUEVO
                 imagen=filename
             )
 

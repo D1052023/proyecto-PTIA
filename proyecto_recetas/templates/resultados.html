@@ -37,5 +37,13 @@
             <li>{{ paso }}</li>
         {% endfor %}
     </ol>
+    <h2>⏱ Tiempo de preparación:</h2>
+    <p>
+        {% if tiempo_preparacion != "No disponible" %}
+            {{ tiempo_preparacion }} minutos
+        {% else %}
+            No disponible
+        {% endif %} 
+    </p>
 </body>
 </html>
