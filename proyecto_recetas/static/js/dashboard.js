@@ -21,12 +21,16 @@ let inp, chips, list, ctr, btn, toast, tipsGrid;
 let currentFile         = null;
 let detectedIngredients = [];
 let selectedDetected    = new Set();
-let activeTab           = 'ingredients'; // 'ingredients' | 'dish'
+let activeTab           = 'ingredients'; // 'ingredients' | 'produce' | 'dish'
 
 const TAB_TEXTS = {
   ingredients: {
-    desc: 'Sube una foto de tu nevera o ingredientes sueltos para detectarlos automáticamente',
+    desc: 'Sube una foto de tu nevera o varios ingredientes; la IA en la nube los listará',
     btn:  'Detectar ingredientes',
+  },
+  produce: {
+    desc: 'Fotografía una sola fruta o verdura: modelo local ResNet-50 (36 clases)',
+    btn:  'Clasificar',
   },
   dish: {
     desc: 'Sube una foto de un platillo preparado y extraeremos sus ingredientes automáticamente',
@@ -171,10 +175,22 @@ function showToast(msg) {
 // MODAL — TABS
 // ════════════════════════════════════════════════════════════
 
+function resetDetectionHeader() {
+  document.getElementById('detection-title').textContent =
+    'Ingredientes detectados — haz clic para deseleccionar';
+  const meta = document.getElementById('detection-meta');
+  meta.style.display = 'none';
+  meta.textContent = '';
+  const topEl = document.getElementById('produce-top');
+  topEl.style.display = 'none';
+  topEl.innerHTML = '';
+}
+
 function switchTab(tab) {
   activeTab = tab;
 
   document.getElementById('tab-ingredients').classList.toggle('active', tab === 'ingredients');
+  document.getElementById('tab-produce').classList.toggle('active', tab === 'produce');
   document.getElementById('tab-dish').classList.toggle('active', tab === 'dish');
 
   document.getElementById('tab-desc').textContent        = TAB_TEXTS[tab].desc;
@@ -185,6 +201,7 @@ function switchTab(tab) {
   document.getElementById('detection-error').style.display  = 'none';
   document.getElementById('dish-result').style.display      = 'none';
   document.getElementById('detected-chips').innerHTML       = '';
+  resetDetectionHeader();
 
   const old = document.getElementById('btn-add-detected');
   if (old) old.remove();
@@ -213,6 +230,7 @@ function resetCamModal() {
 
   // Resetear tabs visualmente
   document.getElementById('tab-ingredients').classList.add('active');
+  document.getElementById('tab-produce').classList.remove('active');
   document.getElementById('tab-dish').classList.remove('active');
   document.getElementById('tab-desc').textContent         = TAB_TEXTS.ingredients.desc;
   document.getElementById('btn-detect-label').textContent = TAB_TEXTS.ingredients.btn;
@@ -222,6 +240,7 @@ function resetCamModal() {
   document.getElementById('detection-error').style.display  = 'none';
   document.getElementById('dish-result').style.display      = 'none';
   document.getElementById('detected-chips').innerHTML       = '';
+  resetDetectionHeader();
   document.getElementById('file-input').value               = '';
 
   const old = document.getElementById('btn-add-detected');
@@ -265,6 +284,7 @@ function loadFile(file) {
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
   document.getElementById('dish-result').style.display      = 'none';
+  resetDetectionHeader();
 
   const reader = new FileReader();
   reader.onload = (ev) => {
@@ -296,6 +316,8 @@ function setDetectBtnLoading(loading) {
 function detectAuto() {
   if (activeTab === 'ingredients') {
     detectIngredients();
+  } else if (activeTab === 'produce') {
+    detectProduce();
   } else {
     detectDish();
   }
@@ -307,6 +329,7 @@ async function detectIngredients() {
 
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
+  resetDetectionHeader();
   setDetectBtnLoading(true);
 
   try {
@@ -349,6 +372,7 @@ async function detectDish() {
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
   document.getElementById('dish-result').style.display      = 'none';
+  resetDetectionHeader();
   setDetectBtnLoading(true);
 
   try {
@@ -384,6 +408,77 @@ async function detectDish() {
   } catch (err) {
     console.error('Error detectando platillo:', err);
     showDetectionError(err.message || 'No se pudo reconocer el platillo. Inténtalo de nuevo.');
+  } finally {
+    setDetectBtnLoading(false);
+  }
+}
+
+function renderProduceTop(preds) {
+  const topEl = document.getElementById('produce-top');
+  if (!preds || preds.length <= 1) {
+    topEl.style.display = 'none';
+    topEl.innerHTML = '';
+    return;
+  }
+  topEl.style.display = 'block';
+  const rows = preds
+    .map(
+      (p) =>
+        `<div class="produce-top-row"><span>${p.label_es}</span><span>${(p.score * 100).toFixed(1)}%</span></div>`
+    )
+    .join('');
+  topEl.innerHTML =
+    '<span class="produce-top-hint">Otras opciones probables</span>' + rows;
+}
+
+// ── Tab: Fruta/verdura → ResNet-50 local ───────────────────
+async function detectProduce() {
+  if (!currentFile) return;
+
+  document.getElementById('detection-result').style.display = 'none';
+  document.getElementById('detection-error').style.display = 'none';
+  document.getElementById('dish-result').style.display = 'none';
+  setDetectBtnLoading(true);
+
+  try {
+    const formData = new FormData();
+    formData.append('file', currentFile);
+
+    const response = await fetch('/detect-fruits-vegetables', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Error del servidor: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    document.getElementById('detection-title').textContent =
+      'Alimento clasificado (IA local) — haz clic para deseleccionar';
+    const meta = document.getElementById('detection-meta');
+    meta.textContent =
+      'Confianza: ' +
+      (data.confidence * 100).toFixed(1) +
+      '% · ' +
+      (data.label_en || '');
+    meta.style.display = 'block';
+
+    renderProduceTop(data.top_predictions || []);
+
+    detectedIngredients = data.ingredientes || [];
+    if (detectedIngredients.length === 0) {
+      showDetectionError('No se pudo clasificar el alimento.');
+      return;
+    }
+
+    renderDetectedChips(detectedIngredients);
+    document.getElementById('detection-result').style.display = 'block';
+  } catch (err) {
+    console.error('Error clasificando fruta/verdura:', err);
+    showDetectionError(err.message || 'No se pudo clasificar la imagen. Inténtalo de nuevo.');
   } finally {
     setDetectBtnLoading(false);
   }

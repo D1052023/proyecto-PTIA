@@ -1,0 +1,26 @@
+# App web
+flask>=3.0
+flask-bcrypt
+werkzeug
+python-dotenv
+authlib
+google-generativeai
+pymongo
+certifi
+
+# TensorFlow 2.21+ exige protobuf >= 6.31.1 (si queda 5.x, pip avisa conflicto)
+protobuf>=6.31.1,<8
+
+# IA (recomendaciones por texto; embeddings)
+sentence-transformers
+
+# Clasificador frutas/verduras (ResNet-50, Hugging Face)
+torch
+transformers>=4.40
+safetensors
+Pillow
+numpy
+
+# TensorFlow (clasificador de platillos Food-101 en models/modelo_clip.py):
+# NO hay paquete oficial para Python 3.14. Usa Python 3.10–3.12 y luego:
+#   pip install -r requirements-tensorflow.txt

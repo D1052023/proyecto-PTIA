@@ -14,11 +14,24 @@ import google.generativeai as genai
 from recomendador import recomendar_por_texto
 import json
 import os
-from models.modelo_clip import predecir_plato
+from models.modelo_frutas_verduras import predecir_fruta_verdura
 from werkzeug.utils import secure_filename
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def predecir_plato(ruta_imagen):
+    """Food-101 (TensorFlow). Import diferido: TF no tiene wheel para Python 3.14+."""
+    try:
+        from models.modelo_clip import predecir_plato as _infer
+    except ImportError as e:
+        raise RuntimeError(
+            "TensorFlow no está instalado o tu versión de Python no tiene paquete oficial. "
+            "Usa Python 3.10–3.12 y ejecuta: pip install tensorflow"
+        ) from e
+    return _infer(ruta_imagen)
+
 # ── Configurar Gemini ─────────────────────────────────────
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
 
@@ -514,5 +527,43 @@ def detect_dish():
     except Exception as e:
         print(f'Error en detect_dish: {e}')
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/detect-fruits-vegetables', methods=['POST'])
+def detect_fruits_vegetables():
+    """Clasifica una sola fruta o verdura (ResNet-50, 36 clases, modelo local)."""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No se envió ningún archivo'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Archivo vacío'}), 400
+
+    try:
+        upload_folder = os.path.join(BASE_DIR, 'static', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+
+        filename = secure_filename(file.filename)
+        ruta = os.path.join(upload_folder, filename)
+        file.save(ruta)
+
+        pred = predecir_fruta_verdura(ruta, top_k=5)
+        label_es = pred['label_es']
+        return jsonify({
+            'label_en': pred['label_en'],
+            'label_es': label_es,
+            'confidence': pred['confidence'],
+            'top_predictions': pred['top_predictions'],
+            'ingredientes': [label_es],
+        })
+
+    except RuntimeError as e:
+        print(f'Error en detect_fruits_vegetables (dependencias): {e}')
+        return jsonify({'error': str(e)}), 503
+    except Exception as e:
+        print(f'Error en detect_fruits_vegetables: {e}')
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

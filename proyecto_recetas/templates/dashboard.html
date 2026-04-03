@@ -154,7 +154,15 @@
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
            <circle cx="12" cy="13" r="4"/>
           </svg>
-          Ingredientes sueltos
+          Varios ingredientes
+        </button>
+        <button class="cam-tab" id="tab-produce" onclick="switchTab('produce')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C8 6 4 10 4 14a8 8 0 0 0 16 0c0-4-4-8-8-12z"/>
+            <circle cx="12" cy="14" r="3"/>
+          </svg>
+          Fruta o verdura
         </button>
         <button class="cam-tab" id="tab-dish" onclick="switchTab('dish')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -163,7 +171,7 @@
             <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/>
             <line x1="14" y1="1" x2="14" y2="4"/>
           </svg>
-          Tengo un platillo
+          Platillo
         </button>
       </div>
 
@@ -214,8 +222,12 @@
             <polyline points="9 11 12 14 22 4"/>
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
           </svg>
-          <span>Ingredientes detectados — haz clic para deseleccionar</span>
+          <div class="detection-header-text">
+            <span id="detection-title">Ingredientes detectados — haz clic para deseleccionar</span>
+            <span id="detection-meta" class="detection-meta" style="display:none"></span>
+          </div>
         </div>
+        <div id="produce-top" class="produce-top" style="display:none"></div>
         <div id="detected-chips" class="detected-chips"></div>
       </div>
 

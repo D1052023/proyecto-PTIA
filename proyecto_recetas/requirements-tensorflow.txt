@@ -1,0 +1,3 @@
+# Instalar solo con Python 3.10, 3.11 o 3.12 (TensorFlow no publica ruedas para 3.14).
+# Tras crear el venv con esa versión: pip install -r requirements-tensorflow.txt
+tensorflow>=2.15,<2.20
