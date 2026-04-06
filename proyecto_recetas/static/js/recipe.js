@@ -4,72 +4,76 @@ const URL_INGS = params.get('ings')
   ? params.get('ings').split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
   : [];
 
-// Mostrar ingredientes en el heading
+const modoGeneral = URL_INGS.length === 0;
+
 if (URL_INGS.length) {
   const display = URL_INGS.map(i => i.charAt(0).toUpperCase() + i.slice(1)).join(', ');
   document.getElementById('ing-display').textContent = display;
 } else {
-  document.getElementById('ing-display').textContent = 'Sin ingredientes';
+  document.getElementById('ing-display').textContent = 'Recetas populares';
+}
+
+if (modoGeneral) {
+  const sub = document.getElementById('ing-subtitle');
+  if (sub) sub.innerHTML = 'Las recetas más populares de nuestra colección';
 }
 
 // ── Estado global ─────────────────────────────────────────
-let ALL_RECIPES  = [];       // recetas del modelo
-let visibleCount = 6;
-let activeFilter = 'todas';
-let searchQ      = '';
-let sortBy       = 'match';
-let favorites    = new Set();
+let ALL_RECIPES   = [];
+let currentOffset = 0;
+let visibleCount  = 6;
+let activeFilter  = 'todas';
+let searchQ       = '';
+let sortBy        = 'match';
+let favorites     = new Set();
 
-// Cargar favoritos guardados
 try {
   const saved = JSON.parse(localStorage.getItem('rf_favorites')) || [];
   favorites   = new Set(saved.map(r => r.id));
 } catch(e) {}
 
+// ── Helpers de puntaje ────────────────────────────────────
+function getStars(rating) {
+  const r = Math.round(rating || 0);
+  return '★'.repeat(r) + '☆'.repeat(5 - r);
+}
+
 // ── Indicador de carga ────────────────────────────────────
 function showLoading() {
-  // Resetear contadores mientras carga
-  document.getElementById('result-title').textContent  = 'Buscando recetas...';
+  document.getElementById('result-title').textContent  = modoGeneral ? 'Cargando recetas populares...' : 'Buscando recetas...';
   document.getElementById('visible-count').textContent = '0';
-
   document.getElementById('recipes-grid').innerHTML = `
     <div class="loading-state" style="grid-column:1/-1; display:flex; flex-direction:column;
          align-items:center; justify-content:center; gap:12px; padding:60px 0; color:#9ca3af;">
       <div class="loading-spinner"></div>
-      <span style="font-size:13px;">Buscando recetas con tu modelo...</span>
+      <span style="font-size:13px;">${modoGeneral ? 'Cargando recetas populares...' : 'Buscando recetas con tu modelo...'}</span>
     </div>`;
 }
 
-// ── Llamar al modelo TF-IDF ───────────────────────────────
-async function cargarRecetas() {
-  if (!URL_INGS.length) {
-    document.getElementById('recipes-grid').innerHTML = `
-      <div class="empty-search" style="grid-column:1/-1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <span>No se recibieron ingredientes.<br>Vuelve al dashboard y agrega algunos.</span>
-      </div>`;
-    return;
-  }
-
-  showLoading();
+// ── Llamar al modelo ──────────────────────────────────────
+async function cargarRecetas(offset = 0) {
+  if (offset === 0) showLoading();
 
   try {
     const response = await fetch('/api/recetas', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ ingredientes: URL_INGS })
+      body:    JSON.stringify({ ingredientes: URL_INGS, offset })
     });
 
     if (!response.ok) throw new Error(`Error ${response.status}`);
 
-    const data  = await response.json();
-    ALL_RECIPES = (data.recetas || []).map((r, i) => ({ ...r, id: i + 1 }));
+    const data   = await response.json();
+    const nuevas = (data.recetas || []).map((r, i) => ({ ...r, id: offset + i + 1 }));
 
-    document.getElementById('result-title').textContent =
-      `Encontradas: ${ALL_RECIPES.length} recetas`;
+    if (offset === 0) ALL_RECIPES = nuevas;
+    else              ALL_RECIPES = [...ALL_RECIPES, ...nuevas];
+
+    currentOffset = data.offset;
+
+    document.getElementById('result-title').textContent = modoGeneral
+      ? `Recetas populares · ${ALL_RECIPES.length} encontradas`
+      : `Encontradas: ${ALL_RECIPES.length} recetas`;
 
     renderGrid();
 
@@ -90,6 +94,7 @@ async function cargarRecetas() {
 
 // ── Contar ingredientes que coinciden con la URL ──────────
 function matchCount(recipe) {
+  if (modoGeneral) return 0;
   const recipeIngs = (recipe.ingredients_list || []).map(i => i.toLowerCase());
   return URL_INGS.filter(u => recipeIngs.some(r => r.includes(u) || u.includes(r))).length;
 }
@@ -135,7 +140,9 @@ function getFiltered() {
   }
 
   if (activeFilter === 'populares') {
-    data = data.filter(r => matchCount(r) >= 2);
+    data = modoGeneral
+      ? data.filter(r => (r.num_reviews || 0) >= 10)
+      : data.filter(r => matchCount(r) >= 2);
   } else if (activeFilter === 'rapidas') {
     data = data.filter(r => r.minutes <= 20);
   } else if (activeFilter === 'saludables') {
@@ -147,24 +154,30 @@ function getFiltered() {
     data = data.filter(r => favorites.has(r.id));
   }
 
-  if (sortBy === 'match')      data.sort((a, b) => matchCount(b) - matchCount(a));
-  else if (sortBy === 'time')  data.sort((a, b) => a.minutes - b.minutes);
-  else if (sortBy === 'kcal')  data.sort((a, b) => a.calories - b.calories);
-  else if (sortBy === 'name')  data.sort((a, b) => a.name.localeCompare(b.name));
+  if (sortBy === 'match')       data.sort((a, b) => modoGeneral ? (b.popularity_score || 0) - (a.popularity_score || 0) : matchCount(b) - matchCount(a));
+  else if (sortBy === 'time')   data.sort((a, b) => a.minutes - b.minutes);
+  else if (sortBy === 'kcal')   data.sort((a, b) => a.calories - b.calories);
+  else if (sortBy === 'rating') data.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
+  else if (sortBy === 'name')   data.sort((a, b) => a.name.localeCompare(b.name));
 
   return data;
 }
 
 // ── Renderizar grid ───────────────────────────────────────
 function renderGrid() {
-  const grid    = document.getElementById('recipes-grid');
+  const grid     = document.getElementById('recipes-grid');
   const filtered = getFiltered();
-  const data    = filtered.slice(0, visibleCount);
+  const data     = filtered.slice(0, visibleCount);
 
   document.getElementById('visible-count').textContent =
     Math.min(filtered.length, visibleCount);
-  document.getElementById('result-title').textContent =
-    `Encontradas: ${filtered.length} recetas`;
+  document.getElementById('result-title').textContent = modoGeneral
+    ? `Recetas populares · ${filtered.length} encontradas`
+    : `Encontradas: ${filtered.length} recetas`;
+
+  grid.classList.remove('grid--1', 'grid--2');
+  if (data.length === 1) grid.classList.add('grid--1');
+  else if (data.length === 2) grid.classList.add('grid--2');
 
   if (data.length === 0) {
     grid.innerHTML = `
@@ -186,14 +199,22 @@ function renderGrid() {
     const isFav = favorites.has(r.id);
     const ings  = r.ingredients_list || [];
     const total = ings.length;
+    const stars = getStars(r.avg_rating);
 
     const dots = ings.slice(0, 5).map(ing => {
-      const match = URL_INGS.some(u => ing.toLowerCase().includes(u) || u.includes(ing.toLowerCase()));
+      const match = !modoGeneral && URL_INGS.some(u => ing.toLowerCase().includes(u) || u.includes(ing.toLowerCase()));
       return `<span class="dot ${match ? 'dot--filled' : 'dot--empty'}"></span>`;
     }).join('');
 
+    const matchBarHtml = modoGeneral
+      ? `<div class="match-bar"><span class="match-text">★ ${(r.avg_rating || 0).toFixed(1)} · ${r.num_reviews || 0} reseñas</span></div>`
+      : `<div class="match-bar">
+           <span class="match-text">${mc} de ${total} ingredientes coinciden</span>
+           <div class="match-dots">${dots}</div>
+         </div>`;
+
     const tagsHtml = ings.slice(0, 4).map(ing => {
-      const match = URL_INGS.some(u => ing.toLowerCase().includes(u) || u.includes(ing.toLowerCase()));
+      const match = !modoGeneral && URL_INGS.some(u => ing.toLowerCase().includes(u) || u.includes(ing.toLowerCase()));
       return `<span class="ing-tag ${match ? 'ing-tag--match' : 'ing-tag--missing'}">${ing}</span>`;
     }).join('');
 
@@ -208,10 +229,7 @@ function renderGrid() {
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
           </button>
-          <div class="match-bar">
-            <span class="match-text">${mc} de ${total} ingredientes coinciden</span>
-            <div class="match-dots">${dots}</div>
-          </div>
+          ${matchBarHtml}
         </div>
         <div class="card-body">
           <div class="card-title">${r.name}</div>
@@ -231,6 +249,11 @@ function renderGrid() {
               ${r.calories} kcal
             </div>
           </div>
+          <div class="card-rating">
+            <span class="rating-stars">${stars}</span>
+            <span class="rating-val">${(r.avg_rating || 0).toFixed(1)}</span>
+            <span class="rating-reviews">(${r.num_reviews || 0})</span>
+          </div>
           <div class="card-tags">${tagsHtml}</div>
         </div>
       </div>`;
@@ -249,14 +272,16 @@ function toggleFav(e, id) {
     showToast('Eliminado de favoritos');
   } else {
     saved.push({
-      id:         recipe.id,
-      emoji:      getEmoji(recipe.name),
-      name:       recipe.name,
-      badge:      getBadge(recipe).key,
-      time:       recipe.minutes,
-      kcal:       recipe.calories,
-      savedAt:    Date.now(),
-      collection: 'Sin colección',
+      id:          recipe.id,
+      emoji:       getEmoji(recipe.name),
+      name:        recipe.name,
+      badge:       getBadge(recipe).key,
+      time:        recipe.minutes,
+      kcal:        recipe.calories,
+      avg_rating:  recipe.avg_rating,
+      num_reviews: recipe.num_reviews,
+      savedAt:     Date.now(),
+      collection:  'Sin colección',
     });
     showToast('✓ Guardado en favoritos');
   }
@@ -289,6 +314,9 @@ function sortRecipes(val) {
 function loadMore() {
   visibleCount += 3;
   renderGrid();
+  if (visibleCount > ALL_RECIPES.length) {
+    cargarRecetas(currentOffset);
+  }
   showToast('Cargando más recetas...');
 }
 
@@ -302,6 +330,7 @@ function openModal(id) {
   const emoji = getEmoji(r.name);
   const ings  = r.ingredients_list || [];
   const steps = r.steps_list || [];
+  const stars = getStars(r.avg_rating);
 
   const stepsHtml = steps.map((s, i) =>
     `<div class="modal-step">
@@ -311,10 +340,19 @@ function openModal(id) {
   ).join('');
 
   const ingsHtml = ings.map(ing => {
-    const match = URL_INGS.some(u => ing.toLowerCase().includes(u) || u.includes(ing.toLowerCase()));
+    const match = !modoGeneral && URL_INGS.some(u => ing.toLowerCase().includes(u) || u.includes(ing.toLowerCase()));
     return `<span class="ing-tag ${match ? 'ing-tag--match' : 'ing-tag--missing'}"
                   style="font-size:12px;padding:4px 10px">${ing}</span>`;
   }).join('');
+
+  const coincidenciaItem = modoGeneral ? '' : `
+    <div class="modal-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      ${mc}/${ings.length} coinciden
+    </div>`;
 
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-img">${emoji}</div>
@@ -338,12 +376,10 @@ function openModal(id) {
           </svg>
           ${r.calories} kcal
         </div>
+        ${coincidenciaItem}
         <div class="modal-meta-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-          ${mc}/${ings.length} coinciden
+          <span style="color:#f59e0b; font-size:13px; letter-spacing:1px; line-height:1;">${stars}</span>
+          ${(r.avg_rating || 0).toFixed(1)} · ${r.num_reviews || 0} reseñas
         </div>
       </div>
       <div>
@@ -399,7 +435,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-// ── Spinner CSS (inyectado dinámicamente) ─────────────────
+// ── Estilos inyectados ────────────────────────────────────
 const style = document.createElement('style');
 style.textContent = `
   .loading-spinner {
@@ -410,6 +446,26 @@ style.textContent = `
     animation: spin .7s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .recipes-grid.grid--1 {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+  .recipes-grid.grid--2 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 820px;
+  }
+  .card-rating {
+    display: flex; align-items: center; gap: 5px; margin-top: 2px;
+  }
+  .rating-stars {
+    color: #f59e0b; font-size: 12px; letter-spacing: 1px; line-height: 1;
+  }
+  .rating-val {
+    color: #374151; font-size: 12px; font-weight: 600;
+  }
+  .rating-reviews {
+    color: #9ca3af; font-size: 11.5px;
+  }
 `;
 document.head.appendChild(style);
 

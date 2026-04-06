@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Anti-parpadeo preferencias -->
   <script>
     (function() {
       try {
@@ -74,11 +73,10 @@
         </div>
 
         <!-- Heading -->
-        <div class="heading">
+         <div class="heading">
           <h1 id="result-title">Buscando recetas...</h1>
-          <p>Basadas en tus ingredientes: <strong id="ing-display">Huevo, Cebolla</strong></p>
+          <p id="ing-subtitle">Basadas en tus ingredientes: <strong id="ing-display">Huevo, Cebolla</strong></p>
         </div>
-
         <!-- Filters -->
         <div class="filters">
           <button class="filter-btn filter-btn--active" onclick="setFilter('todas', this)">Todas</button>
@@ -93,6 +91,7 @@
           <span class="result-count"><strong id="visible-count">0</strong> recetas mostradas</span>
           <select class="sort-select" onchange="sortRecipes(this.value)">
             <option value="match">Mayor coincidencia</option>
+            <option value="rating">Mejor valoradas</option>
             <option value="time">Más rápidas</option>
             <option value="kcal">Menos calorías</option>
             <option value="name">A–Z</option>
