@@ -21,7 +21,7 @@ let inp, chips, list, ctr, btn, toast, tipsGrid;
 let currentFile         = null;
 let detectedIngredients = [];
 let selectedDetected    = new Set();
-let activeTab           = 'ingredients'; // 'ingredients' | 'dish'
+let activeTab           = 'ingredients';
 
 const TAB_TEXTS = {
   ingredients: {
@@ -82,6 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('cam-modal').addEventListener('click', function(e) {
     if (e.target === this) closeCamModal();
+  });
+
+  // ── Botón "Ver recetas" → pasa ingredientes por URL ──
+  btn.addEventListener('click', () => {
+    if (!ingrs.length) return;
+    const query = encodeURIComponent(ingrs.join(','));
+    window.location.href = `/recipe?ings=${query}`;
   });
 });
 
@@ -173,19 +180,14 @@ function showToast(msg) {
 
 function switchTab(tab) {
   activeTab = tab;
-
   document.getElementById('tab-ingredients').classList.toggle('active', tab === 'ingredients');
   document.getElementById('tab-dish').classList.toggle('active', tab === 'dish');
-
-  document.getElementById('tab-desc').textContent        = TAB_TEXTS[tab].desc;
+  document.getElementById('tab-desc').textContent         = TAB_TEXTS[tab].desc;
   document.getElementById('btn-detect-label').textContent = TAB_TEXTS[tab].btn;
-
-  // Limpiar resultados al cambiar tab
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
   document.getElementById('dish-result').style.display      = 'none';
   document.getElementById('detected-chips').innerHTML       = '';
-
   const old = document.getElementById('btn-add-detected');
   if (old) old.remove();
 }
@@ -211,7 +213,6 @@ function resetCamModal() {
   selectedDetected.clear();
   activeTab           = 'ingredients';
 
-  // Resetear tabs visualmente
   document.getElementById('tab-ingredients').classList.add('active');
   document.getElementById('tab-dish').classList.remove('active');
   document.getElementById('tab-desc').textContent         = TAB_TEXTS.ingredients.desc;
@@ -232,7 +233,7 @@ function resetCamModal() {
 }
 
 // ════════════════════════════════════════════════════════════
-// MODAL — DROPZONE / ARCHIVO
+// MODAL — DROPZONE
 // ════════════════════════════════════════════════════════════
 
 function dragOver(e) {
@@ -248,24 +249,19 @@ function dropFile(e) {
   const file = e.dataTransfer.files[0];
   if (file && file.type.startsWith('image/')) loadFile(file);
 }
-
 function fileSelected(e) {
   const file = e.target.files[0];
   if (file) loadFile(file);
 }
-
 function changeImage(e) {
   e.stopPropagation();
   document.getElementById('file-input').click();
 }
-
 function loadFile(file) {
   currentFile = file;
-
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
   document.getElementById('dish-result').style.display      = 'none';
-
   const reader = new FileReader();
   reader.onload = (ev) => {
     document.getElementById('preview-img').src = ev.target.result;
@@ -274,12 +270,10 @@ function loadFile(file) {
   };
   reader.readAsDataURL(file);
 }
-
 function showDzState(state) {
   document.getElementById('dz-idle').style.display    = state === 'idle'    ? 'flex' : 'none';
   document.getElementById('dz-preview').style.display = state === 'preview' ? 'flex' : 'none';
 }
-
 function setDetectBtnLoading(loading) {
   const btnDetect = document.getElementById('btn-detect');
   const label     = document.getElementById('btn-detect-label');
@@ -290,100 +284,68 @@ function setDetectBtnLoading(loading) {
 }
 
 // ════════════════════════════════════════════════════════════
-// DETECCIÓN — dispatcher según tab activo
+// DETECCIÓN
 // ════════════════════════════════════════════════════════════
 
 function detectAuto() {
-  if (activeTab === 'ingredients') {
-    detectIngredients();
-  } else {
-    detectDish();
-  }
+  if (activeTab === 'ingredients') detectIngredients();
+  else detectDish();
 }
 
-// ── Tab: Ingredientes sueltos → Gemini ────────────────────
 async function detectIngredients() {
   if (!currentFile) return;
-
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
   setDetectBtnLoading(true);
-
   try {
     const formData = new FormData();
     formData.append('file', currentFile);
-
-    const response = await fetch('/detect-ingredients', {
-      method: 'POST',
-      body: formData
-    });
-
+    const response = await fetch('/detect-ingredients', { method: 'POST', body: formData });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.error || `Error del servidor: ${response.status}`);
     }
-
     const data = await response.json();
     detectedIngredients = data.ingredientes || [];
-
     if (detectedIngredients.length === 0) {
       showDetectionError('No se detectaron ingredientes. Intenta con una foto más clara.');
       return;
     }
-
     renderDetectedChips(detectedIngredients);
     document.getElementById('detection-result').style.display = 'block';
-
   } catch (err) {
-    console.error('Error detectando ingredientes:', err);
-    showDetectionError(err.message || 'No se pudo analizar la imagen. Inténtalo de nuevo.');
+    showDetectionError(err.message || 'No se pudo analizar la imagen.');
   } finally {
     setDetectBtnLoading(false);
   }
 }
 
-// ── Tab: Platillo → Food-101 ──────────────────────────────
 async function detectDish() {
   if (!currentFile) return;
-
   document.getElementById('detection-result').style.display = 'none';
   document.getElementById('detection-error').style.display  = 'none';
   document.getElementById('dish-result').style.display      = 'none';
   setDetectBtnLoading(true);
-
   try {
     const formData = new FormData();
     formData.append('file', currentFile);
-
-    const response = await fetch('/detect-dish', {
-      method: 'POST',
-      body: formData
-    });
-
+    const response = await fetch('/detect-dish', { method: 'POST', body: formData });
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.error || `Error del servidor: ${response.status}`);
     }
-
     const data = await response.json();
-
-    // Mostrar nombre del platillo
-    document.getElementById('dish-name').textContent    = data.plato || '';
+    document.getElementById('dish-name').textContent     = data.plato || '';
     document.getElementById('dish-result').style.display = 'block';
-
     detectedIngredients = data.ingredientes || [];
-
     if (detectedIngredients.length === 0) {
       showDetectionError('Platillo detectado pero sin ingredientes registrados.');
       return;
     }
-
     renderDetectedChips(detectedIngredients);
     document.getElementById('detection-result').style.display = 'block';
-
   } catch (err) {
-    console.error('Error detectando platillo:', err);
-    showDetectionError(err.message || 'No se pudo reconocer el platillo. Inténtalo de nuevo.');
+    showDetectionError(err.message || 'No se pudo reconocer el platillo.');
   } finally {
     setDetectBtnLoading(false);
   }
@@ -396,12 +358,9 @@ async function detectDish() {
 function renderDetectedChips(items) {
   selectedDetected.clear();
   items.forEach(i => selectedDetected.add(i));
-
   const container = document.getElementById('detected-chips');
   container.innerHTML = '';
-
   updateAddButton();
-
   items.forEach(name => {
     const chip = document.createElement('div');
     chip.className = 'detected-chip selected';
@@ -434,16 +393,13 @@ function updateAddButton() {
     document.querySelector('.cam-modal-footer').prepend(addBtn);
   }
   const n = selectedDetected.size;
-  addBtn.textContent = n > 0
-    ? `Agregar ${n} ingrediente${n === 1 ? '' : 's'}`
-    : 'Selecciona al menos uno';
+  addBtn.textContent = n > 0 ? `Agregar ${n} ingrediente${n === 1 ? '' : 's'}` : 'Selecciona al menos uno';
   addBtn.disabled = n === 0;
 }
 
 function addDetectedToList() {
   const names = [...selectedDetected];
   const added = [];
-
   names.forEach(name => {
     if (!ingrs.includes(name)) {
       ingrs.push(name);
@@ -452,19 +408,15 @@ function addDetectedToList() {
       added.push(name);
     }
   });
-
   sync();
-
   if (added.length) {
     showToast(`✓ ${added.length} ingrediente${added.length === 1 ? '' : 's'} agregado${added.length === 1 ? '' : 's'}`);
   } else {
     showToast('Esos ingredientes ya estaban en tu lista');
   }
-
   closeCamModal();
 }
 
-// ── Helpers ───────────────────────────────────────────────
 function showDetectionError(msg) {
   document.getElementById('error-msg').textContent = msg;
   document.getElementById('detection-error').style.display = 'flex';

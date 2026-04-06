@@ -16,6 +16,8 @@ import json
 import os
 from models.modelo_clip import predecir_plato
 from werkzeug.utils import secure_filename
+from models.recommend import recomendar_por_ingredientes
+from utils.translate import traducir_lista, traducir_receta
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -513,6 +515,60 @@ def detect_dish():
 
     except Exception as e:
         print(f'Error en detect_dish: {e}')
+        return jsonify({'error': str(e)}), 500
+@app.route("/recommend", methods=["GET", "POST"])
+def recommend():
+    if request.method == "POST":
+        texto = request.form["ingredientes"]
+
+        # separar por comas → lista
+        ingredientes = [i.strip() for i in texto.split(",")]
+
+        recetas = recomendar_por_ingredientes(ingredientes, n=5)
+
+        return render_template(
+            "results.html",
+            ingredientes=ingredientes,
+            recetas=recetas
+        )
+
+    return render_template("recommend.html")
+# ══════════════════════════════════════════════════════════
+# API — MODELO DE RECOMENDACIÓN
+# ══════════════════════════════════════════════════════════
+@app.route('/api/recetas', methods=['POST'])
+def api_recetas():
+    try:
+        data         = request.get_json()
+        ingredientes = data.get('ingredientes', [])   # vienen en español
+
+        if not ingredientes:
+            return jsonify({'error': 'No se enviaron ingredientes'}), 400
+
+        # ① Traducir ingredientes ES → EN para que el modelo los entienda
+        ingredientes_en = traducir_lista(ingredientes, src="es", dest="en")
+
+        # ② Buscar con el modelo en inglés
+        recetas = recomendar_por_ingredientes(ingredientes_en, n=30)
+
+        # ③ Normalizar y traducir resultados EN → ES
+        resultado = []
+        for r in recetas:
+            normalizada = {
+                'name':             r.get('name', 'Sin nombre'),
+                'ingredients_list': r.get('ingredients_list', []),
+                'steps_list':       r.get('steps_list', []),
+                'tags_list':        r.get('tags_list', []),
+                'calories':         round(float(r.get('calories', 0))),
+                'minutes':          int(r.get('minutes', 0)),
+            }
+            normalizada = traducir_receta(normalizada)   # traduce todo al español
+            resultado.append(normalizada)
+
+        return jsonify({'recetas': resultado, 'total': len(resultado)})
+
+    except Exception as e:
+        print(f'Error en api_recetas: {e}')
         return jsonify({'error': str(e)}), 500
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

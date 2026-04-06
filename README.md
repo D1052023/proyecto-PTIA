@@ -162,6 +162,8 @@ py -m pip install google-generativeai
 py -m pip install sentence-transformers
 py -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 py -m pip install tensorflow  
+py -m pip install pandas
+py -m pip install deep-translator
 ```
 
 ### 🔐 Dependencias adicionales (autenticación y seguridad)

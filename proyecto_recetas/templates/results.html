@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados</title>
+</head>
+<body>
+
+<h1>Recetas recomendadas</h1>
+
+<p><strong>Ingredientes recibidos:</strong> {{ ingredientes|join(', ') }}</p>
+
+<hr>
+
+{% for r in recetas %}
+<div style="margin-bottom: 30px;">
+
+    <h2>{{ r.name }}</h2>
+
+    <p><strong>Calorías:</strong> {{ r.calories }}</p>
+    <p><strong>Tiempo estimado:</strong> {{ r.minutes }} min</p>
+
+    <p><strong>Categorías:</strong> {{ r.tags_list }}</p>
+
+    <p><strong>Ingredientes:</strong></p>
+    <ul>
+        {% for ing in r.ingredients_list %}
+        <li>{{ ing }}</li>
+        {% endfor %}
+    </ul>
+
+    <p><strong>Pasos de preparación:</strong></p>
+    <ol>
+        {% for paso in r.steps_list %}
+        <li>{{ paso }}</li>
+        {% endfor %}
+    </ol>
+
+    <hr>
+
+</div>
+{% endfor %}
+
+</body>
+</html>
