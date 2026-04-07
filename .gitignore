@@ -207,7 +207,6 @@ marimo/_lsp/
 __marimo__/
 # 🔐 Secrets (CRITICO)
 client_secret_*.json
-*.json
 
 # opcional (más seguro aún)
 proyecto_recetas/static/locales/*.json
