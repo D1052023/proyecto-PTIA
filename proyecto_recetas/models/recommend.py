@@ -6,7 +6,7 @@ import ast
 tfidf        = joblib.load("models/tfidf_vectorizer.pkl")
 tfidf_matrix = joblib.load("models/tfidf_matrix.pkl")
 
-recipes = pd.read_csv("data/recipes_processed.csv")
+recipes = pd.read_csv("data/recipes_processed.csv.gz")
 
 def to_list(x):
     try:
