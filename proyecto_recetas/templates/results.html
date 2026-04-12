@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            max-width: 900px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        .card h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Recetas recomendadas</h1>
+
+<p><strong>Ingredientes recibidos:</strong> {{ ingredientes|join(', ') }}</p>
+<hr>
+
+{% for r in recetas %}
+<div class="card">
+
+    <h2>{{ r.name }}</h2>
+
+    <p><strong>Calorías:</strong> {{ r.calories }}</p>
+    <p><strong>Tiempo estimado:</strong> {{ r.minutes }} min</p>
+    
+    <p><strong>Rating promedio:</strong> ⭐ {{ r.avg_rating }}</p>
+    <p><strong>Número de reseñas:</strong> {{ r.num_reviews }}</p>
+    <p><strong>Puntuación de popularidad:</strong> {{ r.popularity_score }}</p>
+
+    <p><strong>Categorías:</strong> {{ r.tags_list }}</p>
+
+    <h3>Ingredientes:</h3>
+    <ul>
+        {% for ing in r.ingredients_list %}
+        <li>{{ ing }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Pasos de preparación:</h3>
+    <ol>
+        {% for paso in r.steps_list %}
+        <li>{{ paso }}</li>
+        {% endfor %}
+    </ol>
+
+</div>
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recomendar Recetas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Recomendar Recetas por Ingredientes</h1>
+
+    <form action="/recommend" method="POST">
+        <label>Escribe los ingredientes separados por comas:</label><br><br>
+
+        <input type="text" name="ingredientes" 
+               placeholder="chicken, garlic, onion" 
+               style="width: 350px">
+
+        <br><br>
+        <button type="submit">Buscar recetas</button>
+    </form>
+
+</body>
+</html>

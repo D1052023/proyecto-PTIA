@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resultado IA</title>
+</head>
+<body>
+
+    <h1>🍽 Resultado</h1>
+
+    <h2>Plato detectado:</h2>
+    <p>{{ plato_detectado }}</p>
+
+    <h2>Ingredientes:</h2>
+    <ul>
+        {% for i in ingredientes %}
+            <li>{{ i }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>🔥 Calorías:</h2>
+        <p>
+            {% if total_calorias != "No disponible" %}
+                {{ total_calorias }} kcal
+            {% else %}
+                No hay datos de calorías
+            {% endif %}
+        </p>
+    <h2>🏷 Categorías:</h2>
+    <ul>
+        {% for c in categorias %}
+            <li>{{ c }}</li>
+        {% endfor %}
+    </ul>
+    <h2>👨‍🍳 Receta:</h2>
+    <ol>
+        {% for paso in pasos %}
+            <li>{{ paso }}</li>
+        {% endfor %}
+    </ol>
+    <h2>⏱ Tiempo de preparación:</h2>
+    <p>
+        {% if tiempo_preparacion != "No disponible" %}
+            {{ tiempo_preparacion }} minutos
+        {% else %}
+            No disponible
+        {% endif %} 
+    </p>
+</body>
+</html>

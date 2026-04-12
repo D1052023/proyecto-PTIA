@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Anti-parpadeo preferencias -->
   <script>
     (function() {
       try {
@@ -42,7 +41,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <span>Recetas</span>
       </button>
-      <button class="nav-btn" id="nav-favs">
+      <button class="nav-btn" onclick="window.location.href='/favorites'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <span>Favoritos</span>
       </button>
@@ -74,11 +73,10 @@
         </div>
 
         <!-- Heading -->
-        <div class="heading">
-          <h1 id="result-title">Encontradas: 6 recetas</h1>
-          <p>Basadas en tus ingredientes: <strong id="ing-display">Huevo, Cebolla</strong></p>
+         <div class="heading">
+          <h1 id="result-title">Buscando recetas...</h1>
+          <p id="ing-subtitle">Basadas en tus ingredientes: <strong id="ing-display">Huevo, Cebolla</strong></p>
         </div>
-
         <!-- Filters -->
         <div class="filters">
           <button class="filter-btn filter-btn--active" onclick="setFilter('todas', this)">Todas</button>
@@ -90,9 +88,10 @@
 
         <!-- Sort row -->
         <div class="sort-row">
-          <span class="result-count"><strong id="visible-count">6</strong> recetas mostradas</span>
+          <span class="result-count"><strong id="visible-count">0</strong> recetas mostradas</span>
           <select class="sort-select" onchange="sortRecipes(this.value)">
             <option value="match">Mayor coincidencia</option>
+            <option value="rating">Mejor valoradas</option>
             <option value="time">Más rápidas</option>
             <option value="kcal">Menos calorías</option>
             <option value="name">A–Z</option>
