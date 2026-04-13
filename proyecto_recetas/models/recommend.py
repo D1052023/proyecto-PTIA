@@ -2,12 +2,22 @@ import joblib
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 import ast
+import os
 
-tfidf        = joblib.load("models/tfidf_vectorizer.pkl")
-tfidf_matrix = joblib.load("models/tfidf_matrix.pkl")
+# 📌 Base del proyecto
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-recipes = pd.read_csv("data/recipes_processed.csv.gz")
+# 📌 Rutas correctas
+ruta_csv = os.path.join(BASE_DIR, "..", "data", "recipes_processed.csv.gz")
+ruta_tfidf = os.path.join(BASE_DIR, "..", "models", "tfidf_vectorizer.pkl")
+ruta_matrix = os.path.join(BASE_DIR, "..", "models", "tfidf_matrix.pkl")
 
+# 📌 Cargar modelos y datos
+tfidf = joblib.load(ruta_tfidf)
+tfidf_matrix = joblib.load(ruta_matrix)
+recipes = pd.read_csv(ruta_csv)
+
+# 📌 Convertir strings a listas
 def to_list(x):
     try:
         return ast.literal_eval(x)
@@ -15,9 +25,10 @@ def to_list(x):
         return x
 
 recipes["ingredients_list"] = recipes["ingredients_list"].apply(to_list)
-recipes["steps_list"]       = recipes["steps_list"].apply(to_list)
-recipes["tags_list"]        = recipes["tags_list"].apply(to_list)
+recipes["steps_list"] = recipes["steps_list"].apply(to_list)
+recipes["tags_list"] = recipes["tags_list"].apply(to_list)
 
+# 📌 Columnas a mostrar
 COLUMNAS = [
     "name",
     "ingredients_list",
@@ -30,41 +41,35 @@ COLUMNAS = [
     "popularity_score",
 ]
 
+# 📌 Función principal
 def recomendar_por_ingredientes(ingredientes, n=12, alpha=0.7):
-    """
-    Retorna recetas ordenadas por un score combinado:
-      score_final = alpha * similitud_tfidf + (1 - alpha) * popularity_score_normalizado
-
-    ingredientes : lista de strings en inglés
-    n            : cantidad de resultados a devolver
-    alpha        : peso de la similitud (0-1). 0.7 = 70% similitud, 30% popularidad
-    """
-    query     = " ".join(ingredientes)
+    query = " ".join(ingredientes)
     query_vec = tfidf.transform([query])
 
-    # ── Similitud coseno ──────────────────────────────────
+    # 🔹 similitud
     sim_scores = cosine_similarity(query_vec, tfidf_matrix).flatten()
 
-    # ── Normalizar popularity_score al rango [0, 1] ───────
+    # 🔹 popularidad normalizada
     pop = recipes["popularity_score"].fillna(0).values
     pop_min, pop_max = pop.min(), pop.max()
+
     if pop_max > pop_min:
         pop_norm = (pop - pop_min) / (pop_max - pop_min)
     else:
         pop_norm = pop * 0
 
-    # ── Score final combinado ─────────────────────────────
+    # 🔹 score final
     final_scores = alpha * sim_scores + (1 - alpha) * pop_norm
 
-    # ── Top-n índices por score final ─────────────────────
+    # 🔹 top resultados
     indices = final_scores.argsort()[::-1][:n]
 
     resultados = recipes.iloc[indices][COLUMNAS].to_dict(orient="records")
 
-    # Adjuntar scores para que el frontend pueda mostrarlos
+    # 🔹 agregar métricas
     for i, idx in enumerate(indices):
-        resultados[i]["match_score"]      = round(float(sim_scores[idx]), 4)
+        resultados[i]["match_score"] = round(float(sim_scores[idx]), 4)
         resultados[i]["popularity_score"] = round(float(pop_norm[idx]), 4)
-        resultados[i]["final_score"]      = round(float(final_scores[idx]), 4)
+        resultados[i]["final_score"] = round(float(final_scores[idx]), 4)
 
     return resultados
