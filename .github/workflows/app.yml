@@ -1,9 +1,9 @@
 name: Flask CI
 on:
   push:
-    branches: ["feature/login"]
+    branches: ["develop"]
   pull_request:
-    branches: ["feature/login"]
+    branches: ["develop"]
 
 jobs:
   build:

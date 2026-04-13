@@ -1,1 +1,0 @@
-web: gunicorn proyecto_recetas.app:app

@@ -208,5 +208,9 @@ __marimo__/
 # 🔐 Secrets (CRITICO)
 client_secret_*.json
 
-# opcional (más seguro aún)
-proyecto_recetas/static/locales/*.json
+__pycache__/
+*.pyc
+*.pkl
+.env
+venv/
+static/uploads/
