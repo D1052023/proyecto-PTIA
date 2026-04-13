@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
 from flask_bcrypt import Bcrypt
-from database import users_collection
+from proyecto_recetas.database import users_collection
 from authlib.integrations.flask_client import OAuth
+
 import secrets
 from datetime import datetime, timedelta
 import smtplib
@@ -10,14 +11,16 @@ import locale
 from dotenv import load_dotenv
 import os
 import json
+
 import google.generativeai as genai
-from recomendador import recomendar_por_texto
-import json
-import os
-from models.modelo_clip import predecir_plato
+
+# 🔥 IMPORTS DEL PROYECTO (CORRECTOS)
+from proyecto_recetas.recomendador import recomendar_por_texto
+from proyecto_recetas.models.modelo_clip import predecir_plato
+from proyecto_recetas.models.recommend import recomendar_por_ingredientes
+from proyecto_recetas.utils.translate import traducir_lista, traducir_receta
+
 from werkzeug.utils import secure_filename
-from models.recommend import recomendar_por_ingredientes
-from utils.translate import traducir_lista, traducir_receta
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -544,7 +547,7 @@ def api_recetas():
 
         if sin_filtro:
             # Sin ingredientes → devolver las más populares por popularity_score
-            from models.recommend import recipes, COLUMNAS
+            from proyecto_recetas.models.recommend import recipes, COLUMNAS
             recetas_df   = recipes.sort_values('popularity_score', ascending=False)
             recetas_page = recetas_df.iloc[offset: offset + page_size][COLUMNAS + ['num_reviews','avg_rating','popularity_score']].to_dict(orient='records')
 

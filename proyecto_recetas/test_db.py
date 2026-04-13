@@ -1,4 +1,4 @@
-from database import users_collection
+from proyecto_recetas.database import users_collection
 
 # insertar usuario de prueba
 user = {
