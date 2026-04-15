@@ -207,4 +207,8 @@ marimo/_lsp/
 __marimo__/
 # 🔐 Secrets (CRITICO)
 client_secret_*.json
-
+# ❌ NO ignorar modelos y datos (IMPORTANTE)
+!models/
+!models/*.pkl
+!data/
+!data/*.csv
