@@ -12,8 +12,6 @@ from dotenv import load_dotenv
 import os
 import json
 
-import google.generativeai as genai
-
 # 🔥 IMPORTS DEL PROYECTO (CORRECTOS)
 from proyecto_recetas.recomendador import recomendar_por_texto
 from proyecto_recetas.models.modelo_clip import predecir_plato
@@ -25,7 +23,6 @@ from werkzeug.utils import secure_filename
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # ── Configurar Gemini ─────────────────────────────────────
-genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
 
 try:
     locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
@@ -327,49 +324,6 @@ def recipe():
 def favorites():
     return render_template('favorites.html')
 
-# ── Detección de ingredientes con Gemini ──────────────────
-@app.route('/detect-ingredients', methods=['POST'])
-def detect_ingredients():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No se envió ningún archivo'}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'Archivo vacío'}), 400
-
-    try:
-        img_bytes = file.read()
-        mime_type = file.mimetype or 'image/jpeg'
-
-        image_part = {
-            'mime_type': mime_type,
-            'data': img_bytes
-        }
-
-        prompt = """Analiza esta imagen e identifica todos los alimentos e ingredientes visibles.
-Devuelve ÚNICAMENTE un JSON válido, sin texto adicional, sin backticks, sin markdown.
-El JSON debe tener esta estructura exacta:
-{
-  "ingredientes": ["ingrediente1", "ingrediente2", "ingrediente3"]
-}
-Cada ingrediente debe estar en español, en singular y en minúsculas.
-Si no puedes identificar ningún ingrediente, devuelve: {"ingredientes": []}
-Sé específico (ej: "tomate cherry" en vez de solo "tomate" si es evidente)."""
-
-        model = genai.GenerativeModel('gemini-1.5-flash-8b')
-        response = model.generate_content([prompt, image_part])
-
-        raw   = response.text.strip()
-        clean = raw.replace('```json', '').replace('```', '').strip()
-        data  = json.loads(clean)
-
-        return jsonify(data)
-
-    except json.JSONDecodeError:
-        return jsonify({'error': 'La IA no devolvió un JSON válido'}), 500
-    except Exception as e:
-        print(f'Error en detect_ingredients: {e}')
-        return jsonify({'error': str(e)}), 500
 #@app.route("/recomendar", methods=["GET", "POST"])
 #def recomendar():
     if request.method == "POST":
