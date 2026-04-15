@@ -49,8 +49,16 @@ def recomendar_por_ingredientes(ingredientes, n=12, alpha=0.7):
     # 🔹 similitud
     sim_scores = cosine_similarity(query_vec, tfidf_matrix).flatten()
 
-    # 🔹 popularidad normalizada
+    # 🔹 popularidad
     pop = recipes["popularity_score"].fillna(0).values
+
+    # 🔥 AJUSTE CLAVE
+    min_len = min(len(sim_scores), len(pop))
+
+    sim_scores = sim_scores[:min_len]
+    pop = pop[:min_len]
+
+    # 🔹 normalizar
     pop_min, pop_max = pop.min(), pop.max()
 
     if pop_max > pop_min:
@@ -66,7 +74,6 @@ def recomendar_por_ingredientes(ingredientes, n=12, alpha=0.7):
 
     resultados = recipes.iloc[indices][COLUMNAS].to_dict(orient="records")
 
-    # 🔹 agregar métricas
     for i, idx in enumerate(indices):
         resultados[i]["match_score"] = round(float(sim_scores[idx]), 4)
         resultados[i]["popularity_score"] = round(float(pop_norm[idx]), 4)

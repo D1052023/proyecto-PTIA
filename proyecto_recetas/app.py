@@ -519,8 +519,8 @@ def detect_dish():
     except Exception as e:
         print(f'Error en detect_dish: {e}')
         return jsonify({'error': str(e)}), 500
-#@app.route("/recommend", methods=["GET", "POST"])
-#def recommend():
+@app.route("/recommend", methods=["GET", "POST"])
+def recommend():
     if request.method == "POST":
         texto = request.form["ingredientes"]
 
