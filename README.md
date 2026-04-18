@@ -86,7 +86,7 @@ py train_model.py
 ### 2️⃣ Ejecutar la aplicación
 
 ```bash
-py app.py
+py -m proyecto_recetas.app 
 ```
 
 ### 3️⃣ Abrir en el navegador
