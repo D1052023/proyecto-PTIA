@@ -13,15 +13,12 @@ from dotenv import load_dotenv
 import os
 import json
 
-# 🔥 IMPORTS DEL PROYECTO (CORRECTOS)
-from proyecto_recetas.models.recommend import recomendar_por_ingredientes
-from proyecto_recetas.utils.translate import traducir_lista, traducir_receta
-
 from werkzeug.utils import secure_filename
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HF_API_URL = os.getenv("HF_API_URL")
+HF_RECOMENDER_URL = os.getenv("HF_RECOMENDER_URL")
 
 
 try:
@@ -368,95 +365,54 @@ def detect_dish():
     except Exception as e:
         print(f'Error en detect_dish principal: {e}')
         return jsonify({'error': str(e)}), 500
-#@app.route("/recommend", methods=["GET", "POST"])
-#def recommend():
-    if request.method == "POST":
-        texto = request.form["ingredientes"]
-
-        # separar por comas → lista
-        ingredientes = [i.strip() for i in texto.split(",")]
-
-        recetas = recomendar_por_ingredientes(ingredientes, n=5)
-
-        return render_template(
-            "results.html",
-            ingredientes=ingredientes,
-            recetas=recetas
-        )
-
-    return render_template("recommend.html")
 @app.route('/api/recetas', methods=['POST'])
 def api_recetas():
     try:
-        data         = request.get_json()
+        data = request.get_json()
         ingredientes = data.get('ingredientes', [])
-        offset       = int(data.get('offset', 0))
-        page_size    = 40
-        sin_filtro   = len(ingredientes) == 0   # ← modo general
+        offset = int(data.get('offset', 0))
+        page_size = 40
+        
+        # Si no hay ingredientes, podríamos manejar una lógica local simple o 
+        # pedirle al microservicio una búsqueda general.
+        if len(ingredientes) == 0:
+            # Opción: Mandar una búsqueda vacía o por defecto al microservicio
+            ingredientes = ["popular"] 
 
-        if sin_filtro:
-            # Sin ingredientes → devolver las más populares por popularity_score
-            from proyecto_recetas.models.recommend import recipes, COLUMNAS
-            recetas_df   = recipes.sort_values('popularity_score', ascending=False)
-            recetas_page = recetas_df.iloc[offset: offset + page_size][COLUMNAS + ['num_reviews','avg_rating','popularity_score']].to_dict(orient='records')
+        # 1. Llamada al microservicio de RECOMENDACIÓN en Hugging Face
+        # Enviamos los ingredientes en ESPAÑOL (el microservicio se encarga de traducir)
+        payload = {
+            "ingredientes": ingredientes,
+            "n": offset + page_size,
+            "alpha": 0.7
+        }
 
-            resultado = []
-            for r in recetas_page:
-                normalizada = {
-                    'name':             r.get('name', 'Sin nombre'),
-                    'ingredients_list': r.get('ingredients_list', []),
-                    'steps_list':       r.get('steps_list', []),
-                    'tags_list':        r.get('tags_list', []),
-                    'calories':         round(float(r.get('calories', 0))),
-                    'minutes':          int(r.get('minutes', 0)),
-                    'num_reviews':      int(r.get('num_reviews', 0)),
-                    'avg_rating':       round(float(r.get('avg_rating', 0)), 1),
-                    'match_score':      0.0,
-                    'popularity_score': round(float(r.get('popularity_score', 0)), 4),
-                    'final_score':      round(float(r.get('popularity_score', 0)), 4),
-                }
-                normalizada = traducir_receta(normalizada)
-                resultado.append(normalizada)
+        response = requests.post(HF_RECOMENDER_URL, json=payload, timeout=60)
 
+        if response.status_code != 200:
             return jsonify({
-                'recetas': resultado,
-                'total':   len(resultado),
-                'offset':  offset + page_size,
-                'modo':    'general',
-            })
+                'error': 'El recomendador no respondió correctamente',
+                'detalle': response.json().get('error', 'Error desconocido')
+            }), response.status_code
 
-        # ── Modo normal con ingredientes ──────────────────
-        ingredientes_en = traducir_lista(ingredientes, src="es", dest="en")
-        recetas = recomendar_por_ingredientes(ingredientes_en, n=offset + page_size)
-        recetas_pagina = recetas[offset:]
-
-        resultado = []
-        for r in recetas_pagina:
-            normalizada = {
-                'name':             r.get('name', 'Sin nombre'),
-                'ingredients_list': r.get('ingredients_list', []),
-                'steps_list':       r.get('steps_list', []),
-                'tags_list':        r.get('tags_list', []),
-                'calories':         round(float(r.get('calories', 0))),
-                'minutes':          int(r.get('minutes', 0)),
-                'num_reviews':      int(r.get('num_reviews', 0)),
-                'avg_rating':       round(float(r.get('avg_rating', 0)), 1),
-                'match_score':      round(float(r.get('match_score', 0)), 4),
-                'popularity_score': round(float(r.get('popularity_score', 0)), 4),
-                'final_score':      round(float(r.get('final_score', 0)), 4),
-            }
-            normalizada = traducir_receta(normalizada)
-            resultado.append(normalizada)
+        # 2. El microservicio ya devuelve las recetas TRADUCIDAS y NORMALIZADAS
+        data_ia = response.json()
+        recetas_todas = data_ia.get('recetas', [])
+        
+        # Aplicamos el offset para la paginación
+        recetas_pagina = recetas_todas[offset:]
 
         return jsonify({
-            'recetas': resultado,
-            'total':   len(resultado),
-            'offset':  offset + page_size,
-            'modo':    'ingredientes',
+            'recetas': recetas_pagina,
+            'total': len(recetas_pagina),
+            'offset': offset + page_size,
+            'modo': 'ingredientes_ia'
         })
 
+    except requests.exceptions.Timeout:
+        return jsonify({'error': 'El recomendador tardó demasiado (Timeout)'}), 504
     except Exception as e:
-        print(f'Error en api_recetas: {e}')
+        print(f'Error en api_recetas principal: {e}')
         return jsonify({'error': str(e)}), 500
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
