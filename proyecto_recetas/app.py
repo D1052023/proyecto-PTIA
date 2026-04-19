@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for, ses
 from flask_bcrypt import Bcrypt
 from proyecto_recetas.database import users_collection
 from authlib.integrations.flask_client import OAuth
+import requests
 
 import secrets
 from datetime import datetime, timedelta
@@ -13,8 +14,6 @@ import os
 import json
 
 # 🔥 IMPORTS DEL PROYECTO (CORRECTOS)
-from proyecto_recetas.recomendador import recomendar_por_texto
-from proyecto_recetas.models.modelo_clip import predecir_plato
 from proyecto_recetas.models.recommend import recomendar_por_ingredientes
 from proyecto_recetas.utils.translate import traducir_lista, traducir_receta
 
@@ -22,7 +21,8 @@ from werkzeug.utils import secure_filename
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# ── Configurar Gemini ─────────────────────────────────────
+HF_API_URL = os.getenv("HF_API_URL")
+
 
 try:
     locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
@@ -324,113 +324,6 @@ def recipe():
 def favorites():
     return render_template('favorites.html')
 
-#@app.route("/recomendar", methods=["GET", "POST"])
-#def recomendar():
-    if request.method == "POST":
-
-        if "foto" in request.files:
-            foto = request.files["foto"]
-
-            # 🔥 1. Guardar imagen correctamente
-            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
-            os.makedirs(upload_folder, exist_ok=True)
-
-            filename = secure_filename(foto.filename)
-            ruta = os.path.join(upload_folder, filename)
-            foto.save(ruta)
-
-            # 🔥 2. Detectar plato con IA
-            plato = predecir_plato(ruta)
-            plato = plato.lower().strip()
-
-            # 🔥 3. Cargar ingredientes por plato
-            mapa_path = os.path.join(BASE_DIR, "data", "map_plato_ingredientes.json")
-
-            with open(mapa_path, "r", encoding="utf-8") as f:
-                mapa = json.load(f)
-
-            ingredientes_detectados = mapa.get(plato, [])
-
-            # 🔥 4. Convertir ingredientes a texto (para IA NLP)
-            texto_usuario = " ".join(ingredientes_detectados)
-
-            # 🔥 5. Obtener recomendaciones (IA)
-            recomendaciones = recomendar_por_texto(texto_usuario)
-
-            # 🔥 6. Cargar calorías POR PLATO
-            calorias_path = os.path.join(BASE_DIR, "data", "calorias_platos.json")
-
-            if os.path.exists(calorias_path):
-                with open(calorias_path, "r", encoding="utf-8") as f:
-                    calorias_data = json.load(f)
-            else:
-                calorias_data = {}
-
-            total_calorias = calorias_data.get(plato, "No disponible")
-
-            # 🔥 7. Clasificación nutricional
-            if isinstance(total_calorias, int):
-                if total_calorias < 200:
-                    nivel = "🟢 Bajo en calorías"
-                elif total_calorias < 400:
-                    nivel = "🟡 Moderado"
-                else:
-                    nivel = "🔴 Alto en calorías"
-            else:
-                nivel = "No disponible"
-
-            # 🔥 8. Cargar categorías
-            categorias_path = os.path.join(BASE_DIR, "data", "categorias_platos.json")
-
-            if os.path.exists(categorias_path):
-                with open(categorias_path, "r", encoding="utf-8") as f:
-                    categorias_data = json.load(f)
-            else:
-                categorias_data = {}
-
-            categorias = categorias_data.get(plato, ["Sin categoría"])
-
-            # 🔥 9. Cargar recetas
-            recetas_path = os.path.join(BASE_DIR, "data", "recetas_platos.json")
-
-            if os.path.exists(recetas_path):
-                with open(recetas_path, "r", encoding="utf-8") as f:
-                    recetas_data = json.load(f)
-            else:
-                recetas_data = {}
-
-            receta = recetas_data.get(plato, {"pasos": ["Receta no disponible"]})
-            pasos = receta.get("pasos", ["Receta no disponible"])
-
-            # 🔥 10. Cargar TIEMPO DE PREPARACIÓN ⏱
-            tiempos_path = os.path.join(BASE_DIR, "data", "tiempos_preparacion.json")
-
-            if os.path.exists(tiempos_path):
-                with open(tiempos_path, "r", encoding="utf-8") as f:
-                    tiempos_data = json.load(f)
-            else:
-                tiempos_data = {}
-
-            tiempo_preparacion = tiempos_data.get(plato, "No disponible")
-
-            # 🔥 11. Render FINAL
-            return render_template(
-                "resultados.html",
-                plato_detectado=plato,
-                ingredientes=ingredientes_detectados,
-                recomendaciones=recomendaciones,
-                total_calorias=total_calorias,
-                nivel=nivel,
-                categorias=categorias,
-                pasos=pasos,
-                tiempo_preparacion=tiempo_preparacion,  # 👈 NUEVO
-                imagen=filename
-            )
-
-    return render_template("recomendar.html")
-# ── Agregar esta ruta a tu app.py ────────────────────────
-# Va junto al resto de tus rutas, después de /detect-ingredients
-
 @app.route('/detect-dish', methods=['POST'])
 def detect_dish():
     if 'file' not in request.files:
@@ -441,40 +334,42 @@ def detect_dish():
         return jsonify({'error': 'Archivo vacío'}), 400
 
     try:
-        # Guardar imagen temporalmente
-        upload_folder = os.path.join(BASE_DIR, 'static', 'uploads')
-        os.makedirs(upload_folder, exist_ok=True)
+        # 1. Preparar la imagen para enviarla
+        # Leemos los bytes del archivo directamente de la memoria
+        files = {'foto': (file.filename, file.read(), file.content_type)}
 
-        filename = secure_filename(file.filename)
-        ruta     = os.path.join(upload_folder, filename)
-        file.save(ruta)
-
-        # Detectar platillo con tu modelo Food-101
-        plato = predecir_plato(ruta)
-        plato = plato.lower().strip()
-
-        # Cargar mapa platillo → ingredientes
-        mapa_path = os.path.join(BASE_DIR, 'data', 'map_plato_ingredientes.json')
-        with open(mapa_path, 'r', encoding='utf-8') as f:
-            mapa = json.load(f)
-
-        ingredientes = mapa.get(plato, [])
-
-        if not ingredientes:
+        # 2. Llamada al microservicio en Hugging Face
+        # Enviamos un POST a la URL de producción
+        response = requests.post(HF_API_URL, files=files, timeout=20)
+        
+        # 3. Validar respuesta del microservicio
+        if response.status_code != 200:
             return jsonify({
-                'error': f'Platillo "{plato}" detectado pero sin ingredientes registrados'
-            }), 404
+                'error': 'El servicio de IA no respondió correctamente',
+                'detalle': response.json().get('error', 'Error desconocido')
+            }), response.status_code
 
+        # 4. Obtener datos de la IA (plato e ingredientes)
+        data_ia = response.json()
+        
+        # Estructura que devuelve tu Hugging Face: {"plato": "...", "ingredientes": [...]}
+        plato = data_ia.get('plato')
+        ingredientes = data_ia.get('ingredientes', [])
+
+        # 5. Respuesta para tu Frontend
         return jsonify({
             'plato': plato,
-            'ingredientes': ingredientes
+            'ingredientes': ingredientes,
+            'source': 'huggingface_api'
         })
 
+    except requests.exceptions.Timeout:
+        return jsonify({'error': 'La IA tardó demasiado en responder (Timeout)'}), 504
     except Exception as e:
-        print(f'Error en detect_dish: {e}')
+        print(f'Error en detect_dish principal: {e}')
         return jsonify({'error': str(e)}), 500
-@app.route("/recommend", methods=["GET", "POST"])
-def recommend():
+#@app.route("/recommend", methods=["GET", "POST"])
+#def recommend():
     if request.method == "POST":
         texto = request.form["ingredientes"]
 
