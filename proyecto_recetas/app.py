@@ -67,14 +67,18 @@ Si no solicitaste este cambio ignora este correo.
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
-# --- AÑADE ESTO PARA GOOGLE AUTH EN RAILWAY ---
+
+# --- CONFIGURACIÓN PARA GOOGLE AUTH EN RAILWAY ---
 if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):
-    # Fuerza a que OAuth use HTTPS en producción
+    # 1. Le decimos a Flask que confíe en el HTTPS de Railway
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+    
+    # 2. Obligamos a OAuth a usar HTTPS (0 = Seguro)
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
 else:
-    # Permite HTTP en local para que no te dé error en tu PC
+    # En local permitimos HTTP para desarrollo (1 = Inseguro)
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-# ----------------------------------------------
+# ------------------------------------------------
 
 bcrypt = Bcrypt(app)
 oauth = OAuth(app)
