@@ -68,15 +68,29 @@ Si no solicitaste este cambio ignora este correo.
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-# --- ESTO ARREGLA EL ERROR DE LAS IMÁGENES ---
+# --- 1. CONFIGURACIÓN DE SEGURIDAD (RAILWAY & LOCAL) ---
 if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):
-    # Obliga a Flask a reconocer que Railway usa HTTPS
     from werkzeug.middleware.proxy_fix import ProxyFix
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
 else:
+    # Esto permite que funcione en tu PC (http://localhost)
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-# --------------------------------------------
+
+# --- 2. INICIALIZACIÓN DE OBJETOS (ESTO ES LO QUE FALTA) ---
+bcrypt = Bcrypt(app)
+oauth = OAuth(app)
+
+# Aquí es donde se define 'google', por eso te daba el NameError
+google = oauth.register(
+    name="google",
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={
+        "scope": "openid email profile"
+    }
+)
 
 @app.route("/", methods=["GET", "POST"])
 def login():
