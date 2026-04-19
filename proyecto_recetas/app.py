@@ -21,14 +21,10 @@ HF_API_URL = os.getenv("HF_API_URL")
 HF_RECOMENDER_URL = os.getenv("HF_RECOMENDER_URL")
 
 
-try:
-    locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
-except:
-    try:
-        locale.setlocale(locale.LC_TIME, "Spanish_Spain")
-    except:
-        locale.setlocale(locale.LC_TIME, "es_ES")
-
+MESES = {
+    1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril", 5: "Mayo", 6: "Junio",
+    7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
+}
 def enviar_correo(token):
     try:
         remitente = os.getenv("EMAIL_USER")
@@ -261,7 +257,7 @@ def profile():
 
     created = user.get("created_at")
     if created:
-        fecha_registro = created.strftime("%B %Y")
+        fecha_registro = f"{MESES[created.month]} {created.year}"
     else:
         fecha_registro = "Fecha no disponible"
 
