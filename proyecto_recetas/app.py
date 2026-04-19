@@ -14,7 +14,7 @@ import os
 import json
 
 from werkzeug.utils import secure_filename
-from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -68,30 +68,15 @@ Si no solicitaste este cambio ignora este correo.
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-# --- CONFIGURACIÓN PARA GOOGLE AUTH EN RAILWAY ---
+# --- ESTO ARREGLA EL ERROR DE LAS IMÁGENES ---
 if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):
-    # 1. Le decimos a Flask que confíe en el HTTPS de Railway
+    # Obliga a Flask a reconocer que Railway usa HTTPS
+    from werkzeug.middleware.proxy_fix import ProxyFix
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-    
-    # 2. Obligamos a OAuth a usar HTTPS (0 = Seguro)
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
 else:
-    # En local permitimos HTTP para desarrollo (1 = Inseguro)
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-# ------------------------------------------------
-
-bcrypt = Bcrypt(app)
-oauth = OAuth(app)
-
-google = oauth.register(
-    name="google",
-    client_id=os.getenv("GOOGLE_CLIENT_ID"),
-    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={
-        "scope": "openid email profile"
-    }
-)
+# --------------------------------------------
 
 @app.route("/", methods=["GET", "POST"])
 def login():
