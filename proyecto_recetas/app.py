@@ -14,6 +14,7 @@ import os
 import json
 
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,8 +32,13 @@ def enviar_correo(token):
         contraseña = os.getenv("EMAIL_PASS")
         destinatario = "paco.andres03@gmail.com"
 
-        link = f"http://localhost:5000/reset-password/{token}"
+        if os.getenv('PORT'):
+            # En producción, priorizamos una variable de entorno para el dominio
+            domain = os.getenv("DOMAIN_URL", "https://tender-nurturing-development.up.railway.app")
+        else:
+            domain = "http://localhost:5000"
 
+        link = f"{domain}/reset-password/{token}"
         mensaje = MIMEText(f"""
 Hola,
 
@@ -61,6 +67,14 @@ Si no solicitaste este cambio ignora este correo.
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+# --- AÑADE ESTO PARA GOOGLE AUTH EN RAILWAY ---
+if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):
+    # Fuerza a que OAuth use HTTPS en producción
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
+else:
+    # Permite HTTP en local para que no te dé error en tu PC
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+# ----------------------------------------------
 
 bcrypt = Bcrypt(app)
 oauth = OAuth(app)
