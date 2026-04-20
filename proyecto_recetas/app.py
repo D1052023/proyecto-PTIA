@@ -29,6 +29,9 @@ MESES = {
     7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
 }
 def enviar_correo(token):
+    if os.getenv('RAILWAY_ENVIRONMENT'):
+        print("⚠️ Correo desactivado en Railway (puerto SMTP bloqueado)")
+        return
     try:
         remitente = os.getenv("EMAIL_USER")
         contraseña = os.getenv("EMAIL_PASS")
