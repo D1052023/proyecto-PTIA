@@ -29,46 +29,67 @@ MESES = {
     7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
 }
 def enviar_correo(token):
-    if os.getenv('RAILWAY_ENVIRONMENT'):
-        print("⚠️ Correo desactivado en Railway (puerto SMTP bloqueado)")
-        return
     try:
-        remitente = os.getenv("EMAIL_USER")
-        contraseña = os.getenv("EMAIL_PASS")
-        destinatario = "paco.andres03@gmail.com"
+        import base64
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+        from googleapiclient.discovery import build
 
-        if os.getenv('RAILWAY_ENVIRONMENT'):
-            domain = os.getenv("DOMAIN_URL", "https://tender-nurturing-development.up.railway.app")
-        else:
-            domain = "http://localhost:5000"
-
+        domain = os.getenv("DOMAIN_URL", "https://tender-nurturing-development.up.railway.app")
         link = f"{domain}/reset-password/{token}"
-        mensaje = MIMEText(f"Hola,\n\nLink para tu contraseña:\n{link}")
-        mensaje["Subject"] = "Recuperar contraseña"
-        mensaje["From"] = remitente
-        mensaje["To"] = destinatario
 
-        # --- INTENTO DE CONEXIÓN ROBUSTA ---
-        print("INFO: Intentando bypass de red...")
-        # Forzamos la resolución de nombre y usamos un puerto que a veces Railway no filtra
-        try:
-            # Intento A: Puerto 587 estándar
-            servidor = smtplib.SMTP("smtp.gmail.com", 587, timeout=20)
-        except OSError:
-            # Intento B: Si el 587 está bloqueado, probamos el 25 (algunos relays lo permiten)
-            # O el 2525 si usaras otro servicio
-            print("INFO: Puerto 587 bloqueado, intentando alternativa...")
-            servidor = smtplib.SMTP("smtp.gmail.com", 25, timeout=20)
+        # Reconstruir credenciales desde variables de entorno
+        creds = Credentials(
+            token=None,
+            refresh_token=os.getenv("GMAIL_REFRESH_TOKEN"),
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=os.getenv("GOOGLE_CLIENT_ID"),
+            client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+            scopes=["https://www.googleapis.com/auth/gmail.send"]
+        )
 
-        servidor.starttls()
-        servidor.login(remitente, contraseña)
-        servidor.send_message(mensaje)
-        servidor.quit()
-        print("✅ Enviado")
+        # Refrescar el token automáticamente
+        creds.refresh(Request())
+
+        # Construir el servicio de Gmail
+        service = build("gmail", "v1", credentials=creds)
+
+        # Crear el mensaje
+        mensaje = MIMEMultipart("alternative")
+        mensaje["Subject"] = "Recuperar contraseña - RecetaFácil"
+        mensaje["From"]    = os.getenv("GMAIL_SENDER")
+        mensaje["To"]      = "paco.andres03@gmail.com"
+
+        html = f"""
+        <div style="font-family:Inter,sans-serif;max-width:480px;margin:auto;padding:32px">
+          <h2 style="color:#101828">Recuperar contraseña</h2>
+          <p style="color:#6b7280">Haz clic en el botón para cambiar tu contraseña:</p>
+          <a href="{link}" style="display:inline-block;background:#4caf50;color:white;
+             padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">
+            Cambiar contraseña
+          </a>
+          <p style="color:#9ca3af;font-size:12px;margin-top:24px">
+            Este link expira en 15 minutos.<br>
+            Si no solicitaste esto, ignora este correo.
+          </p>
+        </div>
+        """
+
+        mensaje.attach(MIMEText(html, "html"))
+
+        # Codificar y enviar
+        raw = base64.urlsafe_b64encode(mensaje.as_bytes()).decode()
+        service.users().messages().send(
+            userId="me",
+            body={"raw": raw}
+        ).execute()
+
+        print("✅ Correo enviado por Gmail API")
 
     except Exception as e:
-        # Esto evitará el error de "catching classes" y te dirá la verdad
-        print(f"❌ Error final: {type(e).__name__} - {e}")
+        print(f"❌ Error enviando correo: {e}")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
