@@ -29,33 +29,24 @@ MESES = {
 def enviar_correo(token):
     try:
         remitente = os.getenv("EMAIL_USER")
-        contraseña = os.getenv("EMAIL_PASS")
+        contraseña = os.getenv("EMAIL_PASS") # Asegúrate que sea la de 16 dígitos
         destinatario = "paco.andres03@gmail.com"
 
-        # Cambiamos la lógica de detección:
-        # Si existe RAILWAY_ENVIRONMENT, estamos en la nube.
         if os.getenv('RAILWAY_ENVIRONMENT'):
             domain = os.getenv("DOMAIN_URL", "https://tender-nurturing-development.up.railway.app")
         else:
-            # Si no existe, estamos en tu PC
             domain = "http://localhost:5000"
 
         link = f"{domain}/reset-password/{token}"
-        mensaje = MIMEText(f"""
-Hola,
-
-Este es tu link para cambiar la contraseña:
-
-{link}
-
-Si no solicitaste este cambio ignora este correo.
-""")
-
+        mensaje = MIMEText(f"Hola,\n\nLink para cambiar contraseña:\n{link}")
         mensaje["Subject"] = "Recuperar contraseña"
         mensaje["From"] = remitente
         mensaje["To"] = destinatario
 
-        servidor = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+        # USAMOS SMTP NORMAL CON STARTTLS (Es más compatible en nubes que SSL directo)
+        servidor = smtplib.SMTP("smtp.gmail.com", 587, timeout=30)
+        servidor.set_debuglevel(1) # Esto mostrará detalles en los logs de Railway
+        servidor.starttls() 
         servidor.login(remitente, contraseña)
         servidor.send_message(mensaje)
         servidor.quit()
@@ -63,8 +54,7 @@ Si no solicitaste este cambio ignora este correo.
         print("Correo enviado correctamente")
 
     except Exception as e:
-        print("Error enviando correo:", e)
-
+        print(f"Error detallado enviando correo: {str(e)}")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
