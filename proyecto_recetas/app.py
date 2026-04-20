@@ -32,10 +32,12 @@ def enviar_correo(token):
         contraseña = os.getenv("EMAIL_PASS")
         destinatario = "paco.andres03@gmail.com"
 
-        if os.getenv('PORT'):
-            # En producción, priorizamos una variable de entorno para el dominio
+        # Cambiamos la lógica de detección:
+        # Si existe RAILWAY_ENVIRONMENT, estamos en la nube.
+        if os.getenv('RAILWAY_ENVIRONMENT'):
             domain = os.getenv("DOMAIN_URL", "https://tender-nurturing-development.up.railway.app")
         else:
+            # Si no existe, estamos en tu PC
             domain = "http://localhost:5000"
 
         link = f"{domain}/reset-password/{token}"
