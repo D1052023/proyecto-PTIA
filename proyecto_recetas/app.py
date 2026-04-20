@@ -55,8 +55,7 @@ Si no solicitaste este cambio ignora este correo.
         mensaje["From"] = remitente
         mensaje["To"] = destinatario
 
-        servidor = smtplib.SMTP("smtp.gmail.com", 587)
-        servidor.starttls()
+        servidor = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         servidor.login(remitente, contraseña)
         servidor.send_message(mensaje)
         servidor.quit()
