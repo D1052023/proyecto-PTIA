@@ -1,1 +1,1 @@
-web: gunicorn --bind=0.0.0.0:$PORT --timeout 600 --workers 1 proyecto_recetas.app:app
+web: cd proyecto_recetas && gunicorn --bind 0.0.0.0:$PORT --timeout 600 --workers 1 app:app

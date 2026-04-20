@@ -430,6 +430,6 @@ def api_recetas():
         print(f'Error en api_recetas principal: {e}')
         return jsonify({'error': str(e)}), 500
 if __name__ == "__main__":
-    # Railway inyecta la variable PORT, si no existe usa 5000 para tu local
+    # Esto lee el puerto que Railway te da (8080) o usa 5000 en tu PC
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
