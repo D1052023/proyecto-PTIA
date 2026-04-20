@@ -1,3 +1,5 @@
+from socket import socket
+
 from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
 from flask_bcrypt import Bcrypt
 from proyecto_recetas.database import users_collection
@@ -28,33 +30,59 @@ MESES = {
 }
 def enviar_correo(token):
     try:
+        # 1. Obtener variables de entorno
         remitente = os.getenv("EMAIL_USER")
-        contraseña = os.getenv("EMAIL_PASS") # Asegúrate que sea la de 16 dígitos
+        # Asegúrate de que EMAIL_PASS sea la "Contraseña de aplicación" de 16 letras
+        contraseña = os.getenv("EMAIL_PASS") 
         destinatario = "paco.andres03@gmail.com"
 
+        # 2. Detección de entorno para el Dominio
+        # Usamos RAILWAY_ENVIRONMENT que Railway inyecta automáticamente
         if os.getenv('RAILWAY_ENVIRONMENT'):
             domain = os.getenv("DOMAIN_URL", "https://tender-nurturing-development.up.railway.app")
+            print(f"INFO: Generando link para producción: {domain}")
         else:
             domain = "http://localhost:5000"
+            print(f"INFO: Generando link para local: {domain}")
 
         link = f"{domain}/reset-password/{token}"
-        mensaje = MIMEText(f"Hola,\n\nLink para cambiar contraseña:\n{link}")
-        mensaje["Subject"] = "Recuperar contraseña"
+        
+        # 3. Configuración del mensaje
+        mensaje = MIMEText(f"""
+Hola,
+
+Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:
+
+{link}
+
+Este enlace expirará en 15 minutos. Si no solicitaste este cambio, ignora este correo.
+""")
+        mensaje["Subject"] = "Recuperación de Contraseña - S.I.R.I."
         mensaje["From"] = remitente
         mensaje["To"] = destinatario
 
-        # USAMOS SMTP NORMAL CON STARTTLS (Es más compatible en nubes que SSL directo)
-        servidor = smtplib.SMTP("smtp.gmail.com", 587, timeout=30)
-        servidor.set_debuglevel(1) # Esto mostrará detalles en los logs de Railway
-        servidor.starttls() 
+        # 4. Conexión al servidor SMTP
+        # Usamos el puerto 587 con STARTTLS, que es el más estable en Railway
+        print("INFO: Intentando conectar a smtp.gmail.com:587...")
+        
+        servidor = smtplib.SMTP("smtp.gmail.com", 587, timeout=20)
+        servidor.starttls() # Cifrado obligatorio para Gmail
+        
+        print("INFO: Autenticando...")
         servidor.login(remitente, contraseña)
+        
+        print("INFO: Enviando mensaje...")
         servidor.send_message(mensaje)
+        
         servidor.quit()
+        print("✅ Correo enviado con éxito")
 
-        print("Correo enviado correctamente")
-
+    except smtplib.SMTPAuthenticationError:
+        print("❌ Error: La contraseña de aplicación de Gmail es incorrecta.")
+    except socket.timeout:
+        print("❌ Error: Se agotó el tiempo de espera (Timeout) en Railway.")
     except Exception as e:
-        print(f"Error detallado enviando correo: {str(e)}")
+        print(f"❌ Fallo crítico en enviar_correo: {str(e)}")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
