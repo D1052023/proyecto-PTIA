@@ -2,18 +2,28 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 
-# cargar variables
+# Cargar variables
 load_dotenv()
 
-# conexión segura
+# Conexión segura
 MONGO_URI = os.getenv("MONGO_URI")
 
-client = MongoClient(MONGO_URI)
+# Configuramos un timeout para que no se quede colgado si falla la red
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 
-# base de datos (opcional si ya viene en la URI)
+# Base de datos
 db = client.get_database()
 
-# colección
+# Colección
 users_collection = db["users"]
 
-print("✅ Conectado a MongoDB Atlas")
+# ESTO ES LO IMPORTANTE:
+# Solo imprimimos si la conexión es exitosa, pero no ejecutamos inserts aquí.
+try:
+    client.admin.command('ping')
+    print("✅ Conectado exitosamente a MongoDB Atlas")
+except Exception as e:
+    print(f"❌ Error de conexión a MongoDB: {e}")
+
+# BORRA O COMENTA TODO LO QUE SIGUE (El insert y el for de lectura)
+# Esas pruebas debes hacerlas desde rutas en app.py, no aquí.
