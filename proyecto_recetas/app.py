@@ -29,7 +29,7 @@ MESES = {
     1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril", 5: "Mayo", 6: "Junio",
     7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
 }
-def enviar_correo(token):
+def enviar_correo(email, token):  # <--- Agrega email aquí
     try:
         import base64
         from email.mime.multipart import MIMEMultipart
@@ -51,17 +51,13 @@ def enviar_correo(token):
             scopes=["https://www.googleapis.com/auth/gmail.send"]
         )
 
-        # Refrescar el token automáticamente
         creds.refresh(Request())
-
-        # Construir el servicio de Gmail
         service = build("gmail", "v1", credentials=creds)
 
-        # Crear el mensaje
         mensaje = MIMEMultipart("alternative")
         mensaje["Subject"] = "Recuperar contraseña - RecetaFácil"
         mensaje["From"]    = os.getenv("GMAIL_SENDER")
-        mensaje["To"]      = "paco.andres03@gmail.com"
+        mensaje["To"]      = email  # <--- Cambia esto para usar la variable dinámica
 
         html = f"""
         <div style="font-family:Inter,sans-serif;max-width:480px;margin:auto;padding:32px">
@@ -77,17 +73,15 @@ def enviar_correo(token):
           </p>
         </div>
         """
-
         mensaje.attach(MIMEText(html, "html"))
 
-        # Codificar y enviar
         raw = base64.urlsafe_b64encode(mensaje.as_bytes()).decode()
         service.users().messages().send(
             userId="me",
             body={"raw": raw}
         ).execute()
 
-        print("✅ Correo enviado por Gmail API")
+        print(f"✅ Correo enviado por Gmail API a {email}")
 
     except Exception as e:
         print(f"❌ Error enviando correo: {e}")
@@ -243,7 +237,7 @@ def forgot_password():
             }
         )
 
-        enviar_correo(token)
+        enviar_correo(email, token)
         session["reset_email"] = email
         return redirect("/resetPassword")
 
