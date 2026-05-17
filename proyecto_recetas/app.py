@@ -38,7 +38,7 @@ def enviar_correo(token):
         from google.auth.transport.requests import Request
         from googleapiclient.discovery import build
 
-        domain = os.getenv("DOMAIN_URL", "https://tender-nurturing-development.up.railway.app")
+        domain = os.getenv("DOMAIN_URL", "https://proyecto-ptia-production.up.railway.app")
         link = f"{domain}/reset-password/{token}"
 
         # Reconstruir credenciales desde variables de entorno
