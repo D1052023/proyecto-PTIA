@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="english">
+
+<head>
+  <title>con - exported project</title>
+  <meta property="og:title" content="con - exported project" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta property="twitter:card" content="summary_large_image" />
+
+  <style data-tag="reset-style-sheet">
+    html { line-height: 1.15; }
+    body { margin: 0; }
+    * { box-sizing: border-box; border-width: 0; border-style: solid; -webkit-font-smoothing: antialiased; }
+    p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption { margin: 0; padding: 0; }
+    button { background-color: transparent; }
+    button,input,optgroup,select,textarea { font-family: inherit; font-size: 100%; line-height: 1.15; margin: 0; }
+    button,select { text-transform: none; }
+    button,[type="button"],[type="reset"],[type="submit"] { -webkit-appearance: button; color: inherit; }
+    a { color: inherit; text-decoration: inherit; }
+    img { display: block; }
+    html { scroll-behavior: smooth }
+  </style>
+  <style data-tag="default-style-sheet">
+    html { font-family: Inter; font-size: 16px; }
+    body { font-weight: 400; font-style: normal; text-decoration: none; text-transform: none; letter-spacing: normal; line-height: 1.15; color: var(--dl-color-theme-neutral-dark); background: var(--dl-color-theme-neutral-light); fill: var(--dl-color-theme-neutral-dark); }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/animate.css@4.1.1/animate.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" data-tag="font" />
+  <link rel="stylesheet" href="https://unpkg.com/@teleporthq/teleport-custom-scripts/dist/style.css" />
+</head>
+
+<body>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <div>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+
+    <div class="con-container1">
+      <div class="con-thq-holidays-planner-elm">
+        <div class="con-thq-container-elm10">
+          <img src="{{ url_for('static', filename='public/fondologin.svg') }}" alt="" />
+        </div>
+        <div class="con-thq-container-elm11"></div>
+        <div class="con-thq-signup-form-elm">
+          <div class="con-thq-container-elm12">
+            <div class="con-thq-container-elm13">
+              <img src="{{ url_for('static', filename='public/x.svg') }}" alt="Icon1478" class="con-thq-icon-elm1" />
+            </div>
+            <div class="con-thq-text-elm10">
+              <span class="con-thq-text-elm11">RecetaFácil</span>
+            </div>
+          </div>
+          <div class="con-thq-container-elm14">
+            <div class="con-thq-heading1-elm">
+              <span class="con-thq-text-elm12">Crea tu cuenta</span>
+            </div>
+            <div class="con-thq-paragraph-elm1">
+              <span class="con-thq-text-elm13">Registrate para empezar a cocinar</span>
+            </div>
+          </div>
+          <form class="con-thq-form-elm" method="POST" action="/register">
+
+            <!-- Nombre -->
+            <div class="con-thq-container-elm15">
+              <div class="con-thq-label-elm1">
+                <span class="con-thq-text-elm14">Nombre completo</span>
+              </div>
+              <div class="con-thq-container-elm16">
+                <input type="text" name="name" placeholder="Juan Pérez" class="con-thq-input-elm1" required />
+                <img src="{{ url_for('static', filename='public/user.svg') }}" alt="Icon1472" class="con-thq-icon-elm2" />
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="con-thq-container-elm17">
+              <div class="con-thq-label-elm2">
+                <span class="con-thq-text-elm15">Correo electrónico</span>
+              </div>
+              <div class="con-thq-container-elm18">
+                <input type="email" name="email" placeholder="tu@email.com" class="con-thq-input-elm2" required />
+                <img src="{{ url_for('static', filename='public/mail.svg') }}" alt="Icon1473" class="con-thq-icon-elm3" />
+              </div>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="con-thq-container-elm19">
+              <div class="con-thq-label-elm3">
+                <span class="con-thq-text-elm16">Contraseña</span>
+              </div>
+              <div class="con-thq-container-elm20">
+                <input type="password" id="password" name="password" placeholder="••••••••" class="con-thq-input-elm3" required />
+                <img src="{{ url_for('static', filename='public/lock.svg') }}" alt="Icon1474" class="con-thq-icon-elm4" />
+                <button type="button" id="togglePassword" class="con-thq-eye-btn">
+                  <img id="eyeIcon1" src="{{ url_for('static', filename='public/eye.svg') }}" alt="Ver" class="con-thq-eye-icon" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Confirmar contraseña -->
+            <div class="con-thq-container-elm21">
+              <div class="con-thq-label-elm4">
+                <span class="con-thq-text-elm17">Confirmar contraseña</span>
+              </div>
+              <div class="con-thq-container-elm22">
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" class="con-thq-input-elm4" required />
+                <img src="{{ url_for('static', filename='public/lock.svg') }}" alt="Icon1475" class="con-thq-icon-elm5" />
+                <button type="button" id="toggleConfirm" class="con-thq-eye-btn">
+                  <img id="eyeIcon2" src="{{ url_for('static', filename='public/eye.svg') }}" alt="Ver" class="con-thq-eye-icon" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Términos -->
+            <div class="con-thq-container-elm23">
+              <input type="checkbox" name="terms" required class="con-thq-primitivebutton-elm" />
+              <div class="con-thq-label-elm5">
+                <span class="con-thq-text-elm18">
+                  <span class="con-thq-text-elm19">Acepto los</span>
+                  <span class="con-thq-text-elm20"> términos y condiciones</span>
+                  <span class="con-thq-text-elm21"> y la</span>
+                  <span> política de privacidad</span>
+                </span>
+              </div>
+            </div>
+
+            <button type="submit" class="con-thq-button-elm1">
+              <span class="con-thq-text-elm23">Crear Cuenta</span>
+            </button>
+          </form>
+
+          <div class="con-thq-container-elm24">
+            <div class="con-thq-paragraph-elm2">
+              <span class="con-thq-text-elm24">O registrarte con</span>
+            </div>
+            <div class="con-thq-container-elm25">
+              <button type="button" class="con-thq-button-elm2" onclick="window.location.href='/register/google'">
+                <img src="{{ url_for('static', filename='public/google.svg') }}" alt="Icon1476" class="con-thq-icon-elm6" />
+              </button>
+            </div>
+          </div>
+
+          <div class="con-thq-paragraph-elm3">
+            <span class="con-thq-text-elm25">
+              <span class="con-thq-text-elm26">¿Ya tienes una cuenta?</span>
+              <button class="iniciodesesinmvil-thq-button-elm7" onclick="window.location.href='/'">
+                <span class="registro-thq-text-elm19">Inicia Sesión</span>
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle contraseña
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordInput = document.getElementById("password");
+    const eyeIcon1 = document.getElementById("eyeIcon1");
+
+    togglePassword.addEventListener("click", function () {
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon1.src = "{{ url_for('static', filename='public/noeye.svg') }}";
+      } else {
+        passwordInput.type = "password";
+        eyeIcon1.src = "{{ url_for('static', filename='public/eye.svg') }}";
+      }
+    });
+
+    // Toggle confirmar contraseña
+    const toggleConfirm = document.getElementById("toggleConfirm");
+    const confirmInput = document.getElementById("confirm_password");
+    const eyeIcon2 = document.getElementById("eyeIcon2");
+
+    toggleConfirm.addEventListener("click", function () {
+      if (confirmInput.type === "password") {
+        confirmInput.type = "text";
+        eyeIcon2.src = "{{ url_for('static', filename='public/noeye.svg') }}";
+      } else {
+        confirmInput.type = "password";
+        eyeIcon2.src = "{{ url_for('static', filename='public/eye.svg') }}";
+      }
+    });
+  </script>
+
+</body>
+</html>

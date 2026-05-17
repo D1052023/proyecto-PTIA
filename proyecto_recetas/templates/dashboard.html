@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Anti-parpadeo preferencias -->
+  <script>
+    (function() {
+      try {
+        const p = JSON.parse(localStorage.getItem('recetafacil_prefs')) || {};
+        const h = document.documentElement;
+        if (p.dark)     h.classList.add('dark');
+        if (p.compact)  h.classList.add('compact');
+        if (p.fontSize) h.classList.add('font-' + p.fontSize);
+      } catch(e) {}
+    })();
+  </script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecetaFácil – Dashboard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/preferences.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+<div class="root">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+        </svg>
+      </div>
+      <span class="logo-name">RecetaFácil</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='/recipe'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Recetas</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='/favorites'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Favoritos</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-btn" onclick="window.location.href='/profile'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi Perfil</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-scroll">
+      <div class="content">
+        <div class="heading">
+          <h1>Cocina inteligente con lo que tienes</h1>
+          <p>Ingresa los ingredientes y descubre recetas increíbles al instante</p>
+        </div>
+        <div class="grid">
+          <div class="col-left">
+            <div class="card card-ingr">
+              <span class="card-label">Agregar ingredientes</span>
+              <div class="input-row">
+                <div class="input-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input id="ing-input" type="text" placeholder="Ej. Tomates, Cebolla, Arroz..." class="txt-input" />
+                </div>
+                <button class="btn-add" onclick="add()">Agregar</button>
+              </div>
+              <div id="chips"></div>
+            </div>
+            <div class="card card-cam">
+              <div class="cam-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+              <div class="cam-text">
+                <p class="cam-title">Detectar con cámara</p>
+                <p class="cam-desc">Toma una foto a tu refrigerador para identificar ingredientes automáticamente</p>
+              </div>
+              <button class="btn-cam">Abrir cámara</button>
+            </div>
+            <div class="card card-tips">
+              <div class="tips-header">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a7 7 0 0 1 5.292 11.573C16.254 14.84 15.5 16.37 15.5 18H8.5c0-1.63-.754-3.16-1.792-4.427A7 7 0 0 1 12 2zm3.5 17.5H8.5l.5 2h6l.5-2z"/></svg>
+                <span class="tips-title">Combinaciones populares</span>
+              </div>
+              <div class="tips-grid" id="tips-grid"></div>
+            </div>
+          </div>
+          <div class="col-right">
+            <div class="card card-panel">
+              <div class="panel-hdr">
+                <span class="panel-title">Tus Ingredientes</span>
+                <span id="counter">0 agregados</span>
+              </div>
+              <div id="list">
+                <div id="empty">
+                  <div class="empty-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21h6"/></svg>
+                  </div>
+                  <span>Aún no hay ingredientes.<br>¡Empieza agregando uno!</span>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <button class="btn-recipes" id="btn-recipes" disabled >
+                Ver recetas recomendadas
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <p class="hint">Haz clic para ver tus recetas personalizadas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<!-- ═══════════════════════════════════════════════════════
+     REEMPLAZA el modal anterior (cam-modal) en dashboard.html
+     Pega justo antes de </body>
+═══════════════════════════════════════════════════════ -->
+
+  <div id="cam-modal" class="cam-modal-backdrop" style="display:none">
+    <div class="cam-modal">
+
+      <!-- Header -->
+      <div class="cam-modal-header">
+        <span class="cam-modal-title">Detectar con imagen</span>
+        <button class="cam-modal-close" onclick="closeCamModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="cam-tabs">
+        <button class="cam-tab active" id="tab-ingredients" onclick="switchTab('ingredients')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+           <circle cx="12" cy="13" r="4"/>
+          </svg>
+          Ingredientes sueltos
+        </button>
+        <button class="cam-tab" id="tab-dish" onclick="switchTab('dish')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/>
+            <line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+          Tengo un platillo
+        </button>
+      </div>
+
+      <!-- Descripción dinámica -->
+      <p class="cam-tab-desc" id="tab-desc">
+        Sube una foto de tu nevera o ingredientes sueltos para detectarlos automáticamente
+      </p>
+
+      <!-- Dropzone compartida -->
+      <div class="cam-dropzone" id="dropzone"
+          onclick="document.getElementById('file-input').click()"
+           ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+
+        <div id="dz-idle" class="dz-state">
+          <div class="dz-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+             <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <p class="dz-title">Arrastra tu foto aquí</p>
+          <p class="dz-sub" id="dz-sub">o haz clic para seleccionar una imagen</p>
+          <span class="dz-badge">JPG · PNG · WEBP</span>
+        </div>
+
+        <div id="dz-preview" class="dz-state" style="display:none">
+          <img id="preview-img" class="preview-img" alt="preview" />
+          <button class="preview-change" onclick="changeImage(event)">Cambiar imagen</button>
+        </div>
+      </div>
+
+      <input type="file" id="file-input" accept="image/*" style="display:none" onchange="fileSelected(event)" />
+
+      <!-- Resultado: platillo detectado (solo tab dish) -->
+      <div id="dish-result" style="display:none">
+        <div class="dish-detected">
+          <span class="dish-label">Platillo detectado</span>
+          <span class="dish-name" id="dish-name"></span>
+        </div>
+      </div>
+
+      <!-- Resultado: ingredientes -->
+      <div id="detection-result" style="display:none">
+        <div class="detection-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 11 12 14 22 4"/>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+          <span>Ingredientes detectados — haz clic para deseleccionar</span>
+        </div>
+        <div id="detected-chips" class="detected-chips"></div>
+      </div>
+
+      <!-- Error -->
+      <div id="detection-error" class="detection-error" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="error-msg">No se pudo analizar la imagen.</span>
+      </div>
+
+      <!-- Footer -->
+      <div class="cam-modal-footer">
+        <button class="btn-cancel" onclick="closeCamModal()">Cancelar</button>
+        <button class="btn-detect" id="btn-detect" onclick="detectAuto()" disabled>
+          <span id="btn-detect-label">Detectar</span>
+          <span id="btn-detect-spinner" class="spinner" style="display:none"></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
