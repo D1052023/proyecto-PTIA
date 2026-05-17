@@ -375,16 +375,28 @@ def detect_ingredient():
         response = requests.post(
             f"{HF_IA_BASE_URL}/detect-ingredient",
             files=files,
-            timeout=20
+            timeout=30
         )
 
         if response.status_code != 200:
+            # Capturamos el texto crudo para diagnóstico
+            raw = response.text[:300] if response.text else '(respuesta vacía)'
+            print(f"[detect-ingredient] Error {response.status_code}: {raw}")
             return jsonify({
-                'error': 'El servicio de IA no respondió correctamente',
-                'detalle': response.json().get('error', 'Error desconocido')
+                'error': f'El servicio de IA respondió con código {response.status_code}',
+                'detalle': raw
             }), response.status_code
 
-        data_ia = response.json()
+        try:
+            data_ia = response.json()
+        except Exception as parse_err:
+            raw = response.text[:300] if response.text else '(respuesta vacía)'
+            print(f"[detect-ingredient] Respuesta no es JSON: {raw}")
+            return jsonify({
+                'error': 'El servicio de IA devolvió una respuesta inesperada',
+                'detalle': raw
+            }), 502
+
         ingrediente = data_ia.get('ingrediente', '')
 
         return jsonify({
