@@ -301,26 +301,30 @@ async function detectIngredients() {
   setDetectBtnLoading(true);
 
   try {
-    // 🔥 SIMULACIÓN (sin IA por ahora)
-    await new Promise(resolve => setTimeout(resolve, 800)); // pequeña espera para UX
+    const formData = new FormData();
+    formData.append('file', currentFile);
 
-    // ⚠️ Mensaje de futura implementación
-    showDetectionError(
-      '🔧 La detección automática de ingredientes estará disponible próximamente.\n\nPor ahora puedes ingresar los ingredientes manualmente.'
-    );
+    const response = await fetch('/detect-ingredient', { method: 'POST', body: formData });
 
-    // 👉 Opcional: dejar vacío
-    detectedIngredients = [];
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Error del servidor: ${response.status}`);
+    }
 
-    // 👉 Opcional: ejemplo de prueba (puedes activarlo si quieres demo)
-    /*
-    detectedIngredients = ['huevo', 'cebolla'];
+    const data = await response.json();
+    const ingrediente = data.ingrediente || '';
+
+    if (!ingrediente) {
+      showDetectionError('No se pudo identificar ningún ingrediente en la imagen.');
+      return;
+    }
+
+    detectedIngredients = [ingrediente];
     renderDetectedChips(detectedIngredients);
     document.getElementById('detection-result').style.display = 'block';
-    */
 
   } catch (err) {
-    showDetectionError('Error inesperado.');
+    showDetectionError(err.message || 'No se pudo analizar la imagen.');
   } finally {
     setDetectBtnLoading(false);
   }

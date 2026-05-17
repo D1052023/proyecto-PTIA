@@ -22,6 +22,7 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HF_API_URL = os.getenv("HF_API_URL")
 HF_RECOMENDER_URL = os.getenv("HF_RECOMENDER_URL")
+HF_IA_BASE_URL = os.getenv("HF_IA_BASE_URL", HF_API_URL.rsplit("/detect-dish", 1)[0] if HF_API_URL else "")
 
 
 MESES = {
@@ -359,6 +360,44 @@ def recipe():
 @app.route('/favorites')
 def favorites():
     return render_template('favorites.html')
+
+@app.route('/detect-ingredient', methods=['POST'])
+def detect_ingredient():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No se envió ningún archivo'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Archivo vacío'}), 400
+
+    try:
+        files = {'foto': (file.filename, file.read(), file.content_type)}
+        response = requests.post(
+            f"{HF_IA_BASE_URL}/detect-ingredient",
+            files=files,
+            timeout=20
+        )
+
+        if response.status_code != 200:
+            return jsonify({
+                'error': 'El servicio de IA no respondió correctamente',
+                'detalle': response.json().get('error', 'Error desconocido')
+            }), response.status_code
+
+        data_ia = response.json()
+        ingrediente = data_ia.get('ingrediente', '')
+
+        return jsonify({
+            'success': True,
+            'ingrediente': ingrediente
+        })
+
+    except requests.exceptions.Timeout:
+        return jsonify({'error': 'La IA tardó demasiado en responder (Timeout)'}), 504
+    except Exception as e:
+        print(f'Error en detect_ingredient principal: {e}')
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/detect-dish', methods=['POST'])
 def detect_dish():
